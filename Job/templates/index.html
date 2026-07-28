@@ -1,0 +1,99 @@
+{% load static %}
+
+{% block body %}
+
+{% include 'Navigation.html'%}
+
+<style>
+    .container{
+    max-width: 90%;
+    margin: auto;
+    overflow: hidden;   /* 🔥 removes extra right line */
+}
+
+    .content{
+        text-align: center;
+        position: absolute; 
+        bottom: 0; 
+        background: black;
+        color: white;
+        width: 100%;
+        padding: 3px;
+    }
+
+    .circle-img{
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        margin: auto;
+    }
+
+    .img-box{
+        position: relative;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+
+<!-- Banner Image
+<div class="container-fluid" style="margin-top:1%">
+    <img src="{% static 'Job/image/photo4.png' %}" 
+         style="height:450px; width:100%" alt="photo">
+</div>-->
+
+<!-- Students Section -->
+<div class="container" style="background-color:black; height:520px; margin-top:2%">
+    <h1 class="text-center text-white">
+        ----------------| Our Placed Students |---------------
+    </h1>
+
+    <div class="row mt-3">
+
+        <div class="col-md-3 img-box">
+            <img src="{% static 'Job/image/photo5.png' %}" class="circle-img">
+            <div class="content"><p>Facebook</p></div>
+        </div>
+
+        <div class="col-md-3 img-box">
+            <img src="{% static 'Job/image/photo11.png' %}" class="circle-img">
+            <div class="content"><p>Amazon</p></div>
+        </div>
+
+        <div class="col-md-3 img-box">
+            <img src="{% static 'Job/image/photo10.png' %}" class="circle-img">
+            <div class="content"><p>Google</p></div>
+        </div>
+
+        <div class="col-md-3 img-box">
+            <img src="{% static 'Job/image/photo8.png' %}" class="circle-img">
+            <div class="content"><p>TCS</p></div>
+        </div>
+
+        <div class="col-md-3 img-box">
+            <img src="{% static 'Job/image/photo13.png' %}" class="circle-img">
+            <div class="content"><p>HCL</p></div>
+        </div>
+
+        <div class="col-md-3 img-box">
+            <img src="{% static 'Job/image/photo7.png' %}" class="circle-img">
+            <div class="content"><p>GPay</p></div>
+        </div>
+
+        <div class="col-md-3 img-box">
+            <img src="{% static 'Job/image/photo15.png' %}" class="circle-img">
+            <div class="content"><p>Paytm</p></div>
+        </div>
+
+        <div class="col-md-3 img-box">
+            <img src="{% static 'Job/image/photo14.png' %}" class="circle-img">
+            <div class="content"><p>PhonePe</p></div>
+        </div>
+        
+    </div>
+</div>
+
+{% include 'Footer.html'%}
+
+{% endblock %}

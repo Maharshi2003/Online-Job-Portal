@@ -1,0 +1,217 @@
+{% load static %}
+
+{% block body %}
+
+{% include 'Company_navigation.html' %}
+
+<style>
+.custom-marquee {
+    width: 100%;
+    overflow: hidden;
+    background-color: green;
+    margin-top: 1%;
+}
+
+.custom-marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Monotype';
+    font-size: 25px;
+    color: black;
+    font-weight: bold;
+    padding-left: 100%;
+    animation: marquee 12s linear infinite;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+</style>
+
+<div class="custom-marquee">
+    <span>View Recruiter - All</span>
+</div>
+
+<hr>
+
+<div class="container">
+
+    <!-- Search Box -->
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text"
+                   id="candidateSearch"
+                   class="form-control"
+                   placeholder="Search by Name, Email">
+        </div>
+    </div>
+
+    <table class="table table-hover" id="example">
+
+        <thead>
+
+        <tr style="background-color:Yellow;color:red">
+
+            <th>Sr.No</th>
+
+            <th>
+                <i class="fa fa-user mr-2"></i>
+                Full Name
+            </th>
+
+            <th>
+                <i class="fa fa-envelope mr-2"></i>
+                Email Id
+            </th>
+
+            <th>
+                <i class="fa fa-phone-square mr-2"></i>
+                Contact
+            </th>
+
+            <th>Gender</th>
+
+            <th>
+                <i class="fa fa-building mr-2"></i>
+                Company
+            </th>
+
+            <th>
+                <i class="fa fa-image mr-2"></i>
+                Image
+            </th>
+
+            <th>Status</th>
+
+            <th>Action</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for i in data %}
+
+        <tr style="background-color:#f3a69a">
+
+            <td>{{ forloop.counter }}</td>
+
+            <td>
+                {{ i.User.first_name }}
+                {{ i.User.last_name }}
+            </td>
+
+            <td>{{ i.User.username }}</td>
+
+            <td>{{ i.contact_no }}</td>
+
+            <td>{{ i.gender }}</td>
+
+            <td>{{ i.company }}</td>
+
+            <td>
+
+                {% if i.recruiter_image %}
+
+                <img src="{{ i.recruiter_image.url }}"
+                     style="
+                        width:100px;
+                        height:100px;
+                        border-radius:50%;
+                        object-fit:cover;">
+
+                {% else %}
+
+                No Image
+
+                {% endif %}
+
+            </td>
+
+            <td>{{ i.status }}</td>
+
+            <td>
+
+                <!--<a href="{% url 'delete_Recruiter' i.User.id %}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Are you sure you want to delete?')">
+                    Delete
+                </a>-->
+                <a href="{% url 'delete_Recruiter' i.id %}"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Are you sure you want to delete?')">
+                    Delete
+                </a>
+                <br>
+                <a href="{% url 'Change_status' i.id %}"
+                   class="btn btn-success btn-sm"
+                   style="min-width:140px;white-space:nowrap;">
+                    Change Status
+
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="9"
+                style="
+                    text-align:center;
+                    font-size:25px;
+                    font-weight:bold;
+                    color:red;
+                    padding:30px;">
+
+                No Recruiters Found
+
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+document.getElementById("candidateSearch").addEventListener("keyup", function() {
+
+    let value = this.value.toLowerCase();
+
+    let rows = document.querySelectorAll("#example tbody tr");
+
+    rows.forEach(function(row) {
+
+        let text = row.innerText.toLowerCase();
+
+        if(text.indexOf(value) > -1)
+        {
+            row.style.display = "";
+        }
+        else
+        {
+            row.style.display = "none";
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

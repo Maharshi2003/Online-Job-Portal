@@ -1,0 +1,119 @@
+    {% load static %}
+    {% block body %}
+
+    {% if company %}
+        {% include 'Company_navigation.html' %}
+    {% else %}
+        {% include 'Recruiter_navigation.html' %}
+    {% endif %}
+
+    <style>
+        tr { text-align: center; }
+    </style>
+
+    <script>
+    function confirmEdit(){
+        return confirm("Are you sure you want to edit this job?");
+    }
+
+    function confirmDelete(){
+        return confirm("Are you sure you want to delete this job?");
+    }
+
+</script>
+
+<style>
+      .custom-marquee {
+    width: 100%;
+    overflow: hidden;
+    background-color: green;
+    margin-top: 1%;
+}
+
+.custom-marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Monotype';
+    font-size: 25px;
+    color: black;
+    font-weight: bold;
+    padding-left: 100%;
+    animation: marquee 12s linear infinite; 
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+</style>
+
+    <!--<marquee style="
+        font-family: 'Monotype';
+        font-size: 25px;
+        color: black;
+        background-color: green;
+        font-weight: bold;
+        margin-top: 1%;">
+    Manage Job Details
+    </marquee>-->
+
+
+<div class="custom-marquee">
+    <span>  Manage Job Details </span>
+</div>
+
+    <hr>
+
+    <div class="container">
+    <table class="table table-hover" id="example">
+        <thead>
+            <tr style="background-color: Yellow; color: red;">
+                <th>Sr.No</th>
+                <th>Job Title</th>
+                <th>Creation Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for i in jobs %}
+            <tr style="background-color: #51b0c0">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ i.job_title }}</td>
+                <td>{{ i.creation_date }}</td>
+
+                <td>
+                    <!--<a href="{% url 'edit_jobdetails' i.id %}" 
+                    class="btn btn-success btn-sm">Edit</a>
+
+                    |
+
+                    <a href="{% url 'delete_job' i.id %}" 
+                    class="btn btn-danger btn-sm">Delete</a>-->
+
+                <a href="{% url 'edit_jobdetails' i.id %}" 
+                class="btn btn-success btn-sm"
+                onclick="return confirmEdit();">Edit</a>
+
+                |
+
+                <a href="{% url 'delete_job' i.id %}" 
+                class="btn btn-danger btn-sm"
+                onclick="return confirmDelete();">Delete</a>
+
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No Jobs Added Yet</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    {% endblock %}

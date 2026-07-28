@@ -1,0 +1,112 @@
+{% load  static  %}
+
+{% block body%}
+
+{%  include 'Company_navigation.html' %}
+
+<style>
+.custom-marquee {
+    width: 100%;
+    overflow: hidden;
+    background-color: green;
+    margin-top: 1%;
+}
+
+.custom-marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Monotype';
+    font-size: 25px;
+    color: black;
+    font-weight: bold;
+    padding-left: 100%;
+    animation: marquee 12s linear infinite; 
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+</style>
+
+<!--<marquee style="font-family : 'Monotype' ; 
+    font-size : 25px ; color : black ; background-color : green ; font-weight : 
+    bold ; margin-top : 1%">
+   View Recruiter - Rejected   <!--it will show the admin login under the navbar
+</marquee>-->
+
+<div class="custom-marquee">
+    <span>  View Recruiter - Rejected </span>
+</div>
+
+<hr>
+<div class="container">
+    <div class="row mb-3">
+    <div class="col-md-6 ">
+        <input type="text"
+               id="candidateSearch"
+               class="form-control"
+               placeholder="Search by Name, Email">
+    </div>
+</div>
+<table class="table table-hover" id="example">    <!--container will give the margin ljne from both the side-->
+    <thead>
+    <tr style="background-color : Yellow ; color : red ">     <!--we can give the any color-->
+        <th>Sr.No</th>
+        <th><i class="fa fa-user mr-2"><b>Full Name</b></th>
+        <th><i class="fa fa-envelope mr-2"><b>Email Id</b></th>
+        <th><i class="fa fa-phone-square mr-2"><b>Contact</b></th>
+        <th>Gender</th>
+        <th><i class="fa fa-building mr-2"><b>Company</b></th>
+        <th><i class="fa fa-image mr-2"><b>Image</b></th>
+        <th>status</th>
+        <th>Action</th>
+    </tr> 
+    </thead>
+
+    <tbody>
+    {% for i in data %}
+    <tr  style="background-color :  #f3a69a">
+        <td>{{forloop.counter}}</td>   <!--like 1,2,3,etc-->
+        <td>{{i.User.first_name}}  {{i.User.last_name}}</td>
+        <td>{{i.User.username}}</td>
+        <!--<td>{{i.mobile}}</td>-->
+        <td>{{i.contact_no}}</td>
+        <td>{{i.gender}}</td>
+        <td>{{i.company}}</td>
+        <td>
+        {% if i.recruiter_image %}
+            <img src="{{ i.recruiter_image.url }}"
+             style="width:100px;height:100px;border-radius:50%">
+        {% else %}
+        No Image
+        {% endif %}
+        </td>
+        <!--<td><img src = "{{i.image.url}}" style="width : 100px ; height : 100px ; border-radius : 50%"></td>-->
+        <td>{{i.status}}</td>
+        <td><a href="{% url 'Change_status' i.id %}" class="btn btn-success">Change Status</a></td>
+        <!--<td>{{forloop.counter}}</td>-->
+    </tr>
+
+    {% empty %}
+   <tr>
+        <td colspan="9"
+            style="
+                text-align:center;
+                font-size:25px;
+                font-weight:bold;
+                color:red;
+                padding:30px;">
+                No Accepted Recruiters Found
+        </td>
+    </tr>
+     {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

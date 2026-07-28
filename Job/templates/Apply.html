@@ -1,0 +1,90 @@
+{% load static %}
+
+ {% block body %}
+
+ {% include 'User_navigation.html' %}
+
+    <style>
+        tr { text-align: center; }
+
+        .custom-marquee {
+    width: 100%;
+    overflow: hidden;
+    background-color: green;
+    margin-top: 1%;
+}
+
+.custom-marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Monotype';
+    font-size: 25px;
+    color: black;
+    font-weight: bold;
+    padding-left: 100%;
+    animation: marquee 12s linear infinite; 
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+    </style>
+
+<!--<marquee style="
+        font-family: 'Monotype';
+        font-size: 25px;
+        color: black;
+        background-color: green;
+        font-weight: bold;
+        margin-top: 1%;">
+    Apply For Job
+    </marquee>-->
+
+<div class="custom-marquee">
+    <span>Apply For Job</span>
+</div>
+
+
+    <hr>
+
+    <div class="container shadow-lg py-2 mb-2">
+       <div >
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-row">
+                    <label class="font-weight-bold">Upload Resume<label>
+                        <input type="file" class="form-control" name="Resume" required pdf only>        
+                </div>
+                <input type="Submit" vlaue="submit" class="btn btn-success mt-3 ">
+            </form>
+       </div>
+
+    </div>
+
+{% if error == "Close"  %}
+<script>
+    alert("Application Forms Are Closed, last date");
+    window.location.href ="{% url 'User_latestjob' %}";
+</script>
+{% endif %}
+{% if error == "Not Open"  %}
+<script>
+    alert("Application Forms Are Not Open");
+    window.location.href = "{% url 'User_latestjob' %}";
+</script>
+{% endif %}
+{% if error == "Done"  %}
+<script>
+    alert(" Job Applcation Submitted Successfully");
+    window.location.href = "{% url 'User_latestjob' %}";
+</script>
+{% endif %}
+
+{% include 'footer.html'%}
+
+{% endblock %}

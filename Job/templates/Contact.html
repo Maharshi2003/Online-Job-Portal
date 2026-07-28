@@ -1,0 +1,79 @@
+{% load  static  %}
+
+{% block body%}
+
+{%  include 'Navigation.html' %}
+
+<style>
+        .mydiv:hover{
+            box-shadow: 0 0 20px 0 rgba(0,0,0,0.3)
+
+        }
+
+.custom-marquee {
+    width: 100%;
+    overflow: hidden;
+    background-color: green;
+    margin-top: 1%;
+}
+
+.custom-marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Monotype';
+    font-size: 25px;
+    color: black;
+    font-weight: bold;
+    padding-left: 100%;
+    animation: marquee 12s linear infinite; 
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+</style>
+
+<!--<marquee style="font-family : 'Monotype' ; 
+    font-size : 25px ; color : black ; background-color : green ; font-weight : 
+    bold ; margin-top : 1%">
+   Contact Page    <!--it will show the admin login under the navbar
+</marquee>-->
+
+<div class="custom-marquee">
+    <span> Contact Page </span>
+</div>
+
+<hr>
+
+<div class="container mt-5">
+    <br>
+    <div class="row mt-5 justify-content text-center">
+        <div class="col-md-3 m-3 mydiv">
+            <h3 class="text-center" style="color:black"><i class="fa fa-phone-square"></i>Contact</h3>
+            <p class="text-center">+91 9345671973</p>
+        </div>
+
+        <div class="col-md-3 m-3 mydiv">
+            <h3 class="text-center" style="color:black"><i class="fa fa-envelope"></i>Email ID</h3>
+            <p class="text-center">mca24002401110038@gmail.com</p>
+        </div>
+
+        <!--<div class="col-sm-3 mydiv">
+            <h3 class="text-center" style="color:black"><i class="fa fa-address-card"></i>Address</h3>
+            <p class="text-center">Ahmedabad</p>
+        </div>-->
+
+        <div class="col-md-3 m-3 mydiv">
+            <h3 class="text-center" style="color:black"><i class="fa fa-clock"></i>Reporting Timing</h3>
+            <p class="text-center">9:00 Am to 10:00 Pm</p>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% load  static  %}
+
+{% block body%}
+
+{%  include 'Company_navigation.html' %}
+
+<style>
+      .custom-marquee {
+    width: 100%;
+    overflow: hidden;
+    background-color: green;
+    margin-top: 1%;
+}
+
+.custom-marquee span {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: 'Monotype';
+    font-size: 25px;
+    color: black;
+    font-weight: bold;
+    padding-left: 100%;
+    animation: marquee 12s linear infinite; 
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+</style>
+
+<!--<marquee style="font-family : 'Monotype' ; 
+    font-size : 25px ; color : black ; background-color : green ; font-weight : 
+    bold ; margin-top : 1%">
+   View Recruiter - pending   <!--it will show the admin login under the navbar
+</marquee>-->
+
+<div class="custom-marquee">
+    <span> Change Status </span>
+</div>
+
+<hr>
+
+<form class="container mt-5" method="post">
+    {% csrf_token %}
+    <label><b>Recruiter Name</b></label>
+    <input type="text" class="form-control" name="UserName" value="{{recruiter.User.first_name}} {{recruiter.User.last_name}}" readonly>
+
+    <label><b>Status</b></label>
+    <select class="form-control" name="status">
+        <option value="Accepted">Accepted</option>
+        <option value="Rejected">Rejected</option>
+        <option value="Pending">Pending</option>
+    </select>
+
+    <input type="submit" class="btn btn-primary" style="margin-top : 2% ; color ="darkcyan" ; background-color="green" height : 40px ; font-size : 15px">
+</form>
+
+{% if error == "no"  %}
+<script>
+    alert("Status Changed Successfully");
+    window.location.href = "{% url 'Recruiter_pending' %}";
+</script>
+
+{% endif %}
+{% if error == "yes" %}
+<script>
+    alert("Something Wet Wrong, Try Again...");
+</script>
+{% endif %}
+
+{% endblock %}
