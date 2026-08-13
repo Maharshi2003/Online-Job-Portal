@@ -1,267 +1,35 @@
 {% load static %}
-{% block body %}
-
 {% include 'Navigation.html' %}
 
-<style>
-       
-    .custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
+<div class="page-header"><h1>Company Login</h1></div>
 
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite; 
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-document.querySelector("form").addEventListener("submit", function(e){
-
-    e.preventDefault();
-
-    let formData = new FormData(this);
-
-    fetch("{% url 'User_login' %}", {
-
-        method: "POST",
-
-        headers: {
-            "X-Requested-With": "XMLHttpRequest"
-        },
-
-        body: formData
-
-    })
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        if(data.status === "success")
-        {
-            alert(data.message);
-
-            window.location.href = data.redirect_url;
-        }
-
-        else
-        {
-            alert(data.message);
-        }
-
-    });
-
-});
-</style>
-
-
-<script>
-
-document.getElementById("loginForm").addEventListener("submit", async function(e){
-
-    e.preventDefault();
-
-    let response = await fetch("/User_login_api/", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json",
-        },
-
-        body: JSON.stringify({
-
-            username: document.getElementById("username").value,
-            pwd: document.getElementById("pwd").value
-
-        })
-
-    });
-
-    let data = await response.json();
-
-    document.getElementById("message").innerHTML = data.message;
-
-    // Redirect after login success
-    if(data.status === "success"){
-
-        window.location.href = "/dashboard/";
-
-    }
-
-});
-
-</script>
-
-<!--<marquee style="
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    background-color: green;
-    font-weight: bold;
-    margin-top: 1%;">
-    User Login
-</marquee>-->
-
-<div class="custom-marquee">
-    <span> Company Login </span>
-</div>
-
-<hr>
-
-<form class="container mt-5" method="post"  action="{% url 'Company_login_api' %}">  
+<div class="cb-auth-wrap">
+<form class="cb-auth-card" method="post" action="{% url 'Company_login_api' %}">
     {% csrf_token %}
+    <h2>Sign in to your company account</h2>
 
-  <div class="row justify-content-center">
+    <label for="username"><i class="fa fa-envelope mr-1"></i> Email</label>
+    <input type="text" id="username" name="username" class="form-control cb-email-input" placeholder="Enter email" required>
 
-        <div class="col-md-12 login-box">
+    <label for="password"><i class="fa fa-key mr-1"></i> Password</label>
+    <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
 
-            <!-- Login/Register Link -->
-
-            <div class="text-right mb-3">
-
-                <!--<span style="font-size:17px; font-weight:bold;">
-                    Already Registered?
-                </span>
-
-                <a href="{% url 'User_login' %}"
-                   style="color:green; font-weight:bold; text-decoration:none;">
-                   Login
-                </a>
-
-                |
-
-                <a href="#"
-                   style="color:blue; font-weight:bold; text-decoration:none;">
-                   Register
-                </a>-->
-
-            </div>
-
-            <!-- Email -->
-
-            <label>
-                <i class="fa fa-envelope mr-2"></i>
-                <b>Email</b>
-            </label>
-
-            <input type="text"
-               name="username"
-               class="form-control"
-               placeholder="Enter Email"
-               required>
-            <!-- Password -->
-
-            <label class="mt-4">
-                <i class="fa fa-key mr-2"></i>
-                <b>Password</b>
-            </label>
-
-            <input type="password"
-               name="password"
-               class="form-control"
-               placeholder="Enter Password"
-               required>
-
-            <!-- Login Button -->
-
-             <div class="d-flex align-items-center mt-4">
-
-                <input type="submit"
-                value="Login"
-                class="btn btn-primary">
-
-                <a href="{% url 'forgot_password' %}"
-                    class="ml-3"
-                    style="font-size:17px; font-weight:bold;">
-                    Forgot Password?
-                </a>
-
-            </div>
-           <!-- <input type="submit"
-                value="Login"
-                class="btn btn-primary mt-4">
-
-        <span style="float:right; font-size:17px; font-weight:bold; margin-top:8px;">
-
-        <!--Already Registered?-->
-
-        <a href="{% url 'Company_login' %}"
-           style="color:green; font-weight:bold; text-decoration:none;">
-           Don't have an account? 
-        </a>
-
-        |
-
-        <a href="{% url 'Company_Signup' %}"
-           style="color:blue; font-weight:bold; text-decoration:none;">
-           Register
-        </a>
-
-        </span>
-
-
-            <!--<center>
-                <input type="submit"
-                       value="Login"
-                       class="btn btn-success mt-4">
-            </center>-->
-
-        </div>
-
+    <div class="d-flex align-items-center mt-4 flex-wrap">
+        <input type="submit" value="Login" class="btn btn-primary">
+        <a href="{% url 'forgot_password' %}" class="ml-3 font-weight-bold" style="color:var(--cb-green);">Forgot Password?</a>
     </div>
 
-   <!--<label><i class="fa fa-envelope mr-2"></i><b>Email ID</b></label>
-    <input type="email"
-           class="form-control"
-           name="UserName"
-           placeholder="Enter Email ID"
-           required>
-
-    <label class="mt-3"><i class="fa fa-key mr-2"></i><b>Password</b></label>
-    <input type="password"
-           class="form-control"
-           name="pwd"
-           placeholder="Enter Password"
-           required>
-
-    <input type="submit"
-           value="Login"
-           class="btn btn-success mt-4">-->
-
+    <p class="mt-4 mb-0">Don't have an account?
+        <a href="{% url 'Company_Signup' %}" style="color:var(--cb-green);font-weight:700;">Register</a>
+    </p>
 </form>
+</div>
 
-{% include 'footer.html' %}
+{% include 'Footer.html' %}
 
-<!-- 🔹 ERROR MESSAGES -->
-
-{% if error == "empty" %}
-<script>
-    alert("Please fill all fields!");
-</script>
+{% if error == "yes" %}
+<script>alert("Invalid Email or Password!");</script>
 {% endif %}
-
-{% if error == "invalid" %}
-<script>
-    alert("Invalid Email or Password!");
-</script>
+{% if error == "not_company" %}
+<script>alert("This account is not registered as a Company!");</script>
 {% endif %}
-
-{% endblock %}

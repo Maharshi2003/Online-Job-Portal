@@ -1,125 +1,19 @@
-{% load  static  %}
-
-{% block body%}
-
+{% load static %}
 {% include 'Navigation.html' %}
 
-<style>
-    .custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
+<div class="page-header"><h1>Verify OTP</h1></div>
 
-    .custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite; 
-}
+<div class="cb-auth-wrap">
+<form class="cb-auth-card" method="post">
+    {% csrf_token %}
+    <h2>Enter verification code</h2>
+    <p class="job-meta mb-3">Check your email (or server console in development) for the 6-digit OTP.</p>
 
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-</style>
+    <label for="otp"><i class="fa fa-shield mr-1"></i> OTP</label>
+    <input type="text" id="otp" name="otp" class="form-control" placeholder="Enter OTP" required maxlength="6">
 
-<!--<div class="custom-marquee">
-    <span> Verify OTP  </span>
+    <button type="submit" class="btn btn-primary mt-4">Verify OTP</button>
+</form>
 </div>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-4 text-center">
-
-            <h2 class="mb-4">Verify OTP</h2>
-
-            <form method="POST">
-                {% csrf_token %}
-
-                <input type="text" maxlength="1" class="otp-box">
-                <input type="text" maxlength="1" class="otp-box">
-                <input type="text" maxlength="1" class="otp-box">
-                <input type="text" maxlength="1" class="otp-box">
-                <input type="text" maxlength="1" class="otp-box">
-                <input type="text" maxlength="1" class="otp-box">
-
-                <br><br>
-
-                <button type="submit" class="btn btn-primary">
-                    Verify OTP
-                </button>
-
-            </form>
-
-        </div>
-    </div>
-</div>
-
-<style>
-.otp-box{
-    width:50px;
-    height:50px;
-    text-align:center;
-    font-size:24px;
-    margin:5px;
-}
-</style>-->
-
-<div class="container mt-5">
-    <div class="row justify-content-center">
-
-        <div class="col-md-4">
-
-            <form method="POST">
-                {% csrf_token %}
-
-                <input type="text"
-                       name="otp"
-                       maxlength="6"
-                       minlength="6"
-                       class="form-control text-center"
-                       placeholder="Enter Your OTP"
-                       required
-                       style="font-size:22px; letter-spacing:8px;">
-
-                <center>
-                    <input type="submit"
-                           value="Verify OTP"
-                           class="btn btn-primary mt-4">
-                </center>
-
-            </form>
-
-        </div>
-
-    </div>
-</div>
-<!--<form method="POST">
-{% csrf_token %}
-
-<input type="text"
-       name="otp"
-       class="form-control"
-       placeholder="Enter OTP"
-       required>
-
-<br>
-
-<button type="submit"
-        class="btn btn-primary">
-    Verify OTP
-</button>
-
-</form>-->
-
-{% endblock %}
+{% include 'Footer.html' %}

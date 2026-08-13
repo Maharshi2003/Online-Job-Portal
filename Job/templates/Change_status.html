@@ -1,76 +1,38 @@
-{% load  static  %}
+{% load static %}
+{% include 'Company_navigation.html' %}
 
-{% block body%}
+<div class="page-header"><h1>Change Recruiter Status</h1></div>
 
-{%  include 'Company_navigation.html' %}
-
-<style>
-      .custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
-
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite; 
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-</style>
-
-<!--<marquee style="font-family : 'Monotype' ; 
-    font-size : 25px ; color : black ; background-color : green ; font-weight : 
-    bold ; margin-top : 1%">
-   View Recruiter - pending   <!--it will show the admin login under the navbar
-</marquee>-->
-
-<div class="custom-marquee">
-    <span> Change Status </span>
-</div>
-
-<hr>
-
-<form class="container mt-5" method="post">
+<div class="cb-auth-wrap">
+<form class="cb-auth-card" method="post">
     {% csrf_token %}
-    <label><b>Recruiter Name</b></label>
-    <input type="text" class="form-control" name="UserName" value="{{recruiter.User.first_name}} {{recruiter.User.last_name}}" readonly>
+    <h2>Update approval status</h2>
 
-    <label><b>Status</b></label>
-    <select class="form-control" name="status">
-        <option value="Accepted">Accepted</option>
-        <option value="Rejected">Rejected</option>
-        <option value="Pending">Pending</option>
+    <label>Recruiter</label>
+    <input type="text" name="UserName" class="form-control"
+           value="{{ recruiter.User.first_name }} {{ recruiter.User.last_name }}"
+           readonly>
+
+    <label>Status</label>
+    <select name="status" class="form-control" required>
+        <option value="Pending" {% if recruiter.status == "Pending" %}selected{% endif %}>Pending</option>
+        <option value="Accepted" {% if recruiter.status == "Accepted" %}selected{% endif %}>Accepted</option>
+        <option value="Rejected" {% if recruiter.status == "Rejected" %}selected{% endif %}>Rejected</option>
     </select>
 
-    <input type="submit" class="btn btn-primary" style="margin-top : 2% ; color ="darkcyan" ; background-color="green" height : 40px ; font-size : 15px">
+    <button type="submit" class="btn btn-primary mt-4">Save Status</button>
+    <p class="mt-3 mb-0"><a href="{% url 'Recruiter_pending' %}" style="color:var(--cb-green);font-weight:600;">Back to pending</a></p>
 </form>
+</div>
 
-{% if error == "no"  %}
+{% include 'Footer.html' %}
+
+{% if error == "no" %}
 <script>
-    alert("Status Changed Successfully");
-    window.location.href = "{% url 'Recruiter_pending' %}";
+    alert("Status updated successfully!");
+    window.location = "{% url 'Recruiter_pending' %}";
 </script>
-
 {% endif %}
 {% if error == "yes" %}
-<script>
-    alert("Something Wet Wrong, Try Again...");
-</script>
+<script>alert("Something went wrong.");</script>
 {% endif %}
-
-{% endblock %}

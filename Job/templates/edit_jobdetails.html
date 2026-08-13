@@ -1,91 +1,53 @@
 {% load static %}
-{% block body %}
+{% if company %}
+    {% include 'Company_navigation.html' %}
+{% else %}
+    {% include 'Recruiter_navigation.html' %}
+{% endif %}
 
-{% include 'Recruiter_navigation.html' %}
+<div class="page-header"><h1>Edit Job</h1></div>
 
-<div class="container mt-4">
+<div class="cb-auth-wrap-wide">
+<form class="cb-auth-card" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2>Update job details</h2>
 
-    <h3>Edit Job Details</h3>
-    <hr>
-
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <!-- Job Title -->
-
-        <div class="form-group">
-            <label><b>Job Title</b></label>
-            <input type="text"
-                   name="job_title"
-                   class="form-control"
-                   value="{{ job.job_title }}">
+    <div class="cb-form-grid">
+        <div class="full">
+            <label>Job Title</label>
+            <input type="text" name="job_title" class="form-control" value="{{ job.job_title }}">
         </div>
-
-        <!-- Category -->
-
-        <div class="form-group">
-            <label><b>Category</b></label>
-
-            <select name="category" class="form-control">
-
-                <option value="Internship"
-                    {% if job.category.Category == "Internship" %}selected{% endif %}>
-                    Internship
-                </option>
-
-                <option value="Junior Developer"
-                    {% if job.category.Category == "Junior Developer" %}selected{% endif %}>
-                    Junior Developer
-                </option>
-
-                <option value="Senior Developer"
-                    {% if job.category.Category == "Senior Developer" %}selected{% endif %}>
-                    Senior Developer
-                </option>
-
-                <option value="Fresher"
-                    {% if job.category.Category == "Fresher" %}selected{% endif %}>
-                    Fresher
-                </option>
-
-                <option value="AI/ML Intern"
-                    {% if job.category.Category == "AI/ML Intern" %}selected{% endif %}>
-                    AI/ML Intern
-                </option>
-
+        <div>
+            <label>Category</label>
+            <select name="category" id="category" class="form-control" required>
+                <option value="">Select Category</option>
+                <optgroup label="Tech">
+                    <option value="Software Development" {% if job.category.Category == "Software Development" %}selected{% endif %}>Software Development</option>
+                    <option value="Web Development" {% if job.category.Category == "Web Development" %}selected{% endif %}>Web Development</option>
+                    <option value="Data Science & AI" {% if job.category.Category == "Data Science & AI" %}selected{% endif %}>Data Science & AI</option>
+                    <option value="Cloud & DevOps" {% if job.category.Category == "Cloud & DevOps" %}selected{% endif %}>Cloud & DevOps</option>
+                    <option value="Cybersecurity & IT Support" {% if job.category.Category == "Cybersecurity & IT Support" %}selected{% endif %}>Cybersecurity & IT Support</option>
+                    <option value="Fresher" {% if job.category.Category == "Fresher" %}selected{% endif %}>Fresher</option>
+                </optgroup>
+                <optgroup label="Non-Tech">
+                    <option value="Human Resources" {% if job.category.Category == "Human Resources" %}selected{% endif %}>Human Resources</option>
+                    <option value="Marketing & Sales" {% if job.category.Category == "Marketing & Sales" %}selected{% endif %}>Marketing & Sales</option>
+                    <option value="Finance & Accounting" {% if job.category.Category == "Finance & Accounting" %}selected{% endif %}>Finance & Accounting</option>
+                    <option value="Operations & Administration" {% if job.category.Category == "Operations & Administration" %}selected{% endif %}>Operations & Administration</option>
+                    <option value="Design & Content" {% if job.category.Category == "Design & Content" %}selected{% endif %}>Design & Content</option>
+                </optgroup>
             </select>
         </div>
-
-        <!-- Category Type -->
-
-        <div class="form-group">
-            <label><b>Category Type</b></label>
-
-            <select name="category_type" class="form-control">
-
-                <option value="Python Intern" {% if job.category.Category_type == "Python Intern" %}selected{% endif %}>Python Intern</option>
-                <option value="Java Intern" {% if job.category.Category_type == "Java Intern" %}selected{% endif %}>Java Intern</option>
-                <option value="Python Developer" {% if job.category.Category_type == "Python Developer" %}selected{% endif %}>Python Developer</option>
-                <option value="Java Developer" {% if job.category.Category_type == "Java Developer" %}selected{% endif %}>Java Developer</option>
-                <option value="Python Junior Developer" {% if job.category.Category_type == "Python Junior Developer" %}selected{% endif %}>Python Junior Developer</option>
-                <option value="Java Junior Developer" {% if job.category.Category_type == "Java Junior Developer" %}selected{% endif %}>Java Junior Developer</option>
-                <option value="Python Senior Developer" {% if job.category.Category_type == "Python Senior Developer" %}selected{% endif %}>Python Senior Developer</option>
-                <option value="Java Senior Developer" {% if job.category.Category_type == "Java Senior Developer" %}selected{% endif %}>Java Senior Developer</option>
-                <option value="Full Stack Developer" {% if job.category.Category_type == "Full Stack Developer" %}selected{% endif %}>Full Stack Developer</option>
-                <option value="AI/ML Intern" {% if job.category.Category_type == "AI/ML Intern" %}selected{% endif %}>AI/ML Intern</option>
-                <option value="Data Analyst" {% if job.category.Category_type == "Data Analyst" %}selected{% endif %}>Data Analyst</option>
-                <option value="Data Scientist" {% if job.category.Category_type == "Data Scientist" %}selected{% endif %}>Data Scientist</option>
-
+        <div>
+            <label>Sub Category</label>
+            <select name="category_type" id="category_type" class="form-control" required data-selected="{{ job.category.Category_type }}">
+                <option value="">Select Sub Category</option>
             </select>
         </div>
-
-        <!-- Experience -->
-
-        <div class="form-group">
-            <label><b>Experience</b></label>
-
+        <div>
+            <label>Experience</label>
             <select name="experience" class="form-control">
-
+                <option value="{{ job.experience }}" selected>{{ job.experience }}</option>
                 <option value="0-1 Year">0-1 Year</option>
                 <option value="1-1.5 Years">1-1.5 Years</option>
                 <option value="1.5-2 Years">1.5-2 Years</option>
@@ -100,138 +62,64 @@
                 <option value="10-12 Years">10-12 Years</option>
                 <option value="12-15 Years">12-15 Years</option>
                 <option value="15-20 Years">15-20 Years</option>
-
             </select>
         </div>
-
-        <!-- Location -->
-
-        <div class="form-group">
-            <label><b>Location</b></label>
-
-            <input type="text"
-                   name="location"
-                   class="form-control"
-                   value="{{ job.location }}">
+        <div>
+            <label>Location</label>
+            <select name="location" class="form-control" required>
+                <option value="">Select location type</option>
+                <option value="Remote" {% if job.location == "Remote" %}selected{% endif %}>Remote</option>
+                <option value="Hybrid" {% if job.location == "Hybrid" or job.location == "Hybride" %}selected{% endif %}>Hybrid</option>
+                <option value="On-Site" {% if job.location == "On-Site" %}selected{% endif %}>On-Site</option>
+            </select>
         </div>
-
-        <!-- Min Salary -->
-
-        <div class="form-group">
-            <label><b>Minimum Salary</b></label>
-
-            <input type="number"
-                   name="min_salary"
-                   class="form-control"
-                   value="{{ job.min_salary }}">
+        <div>
+            <label>Minimum Salary</label>
+            <input type="number" name="min_salary" class="form-control" value="{{ job.min_salary }}">
         </div>
-
-        <!-- Max Salary -->
-
-        <div class="form-group">
-            <label><b>Maximum Salary</b></label>
-
-            <input type="number"
-                   name="max_salary"
-                   class="form-control"
-                   value="{{ job.max_salary }}">
+        <div>
+            <label>Maximum Salary</label>
+            <input type="number" name="max_salary" class="form-control" value="{{ job.max_salary }}">
         </div>
-
-        <!-- Skills -->
-
-        <div class="form-group">
-            <label><b>Skills</b></label>
-
-            <input type="text"
-                   name="skills"
-                   class="form-control"
-                   value="{{ job.skills }}">
+        <div class="full">
+            <label>Skills</label>
+            <input type="text" name="skills" class="form-control" value="{{ job.skills }}">
         </div>
-
-        <!-- Description -->
-
-        <div class="form-group">
-            <label><b>Job Description</b></label>
-
-            <textarea name="job_description"
-                      class="form-control"
-                      rows="5">{{ job.job_description }}</textarea>
+        <div class="full">
+            <label>Job Description</label>
+            <textarea name="job_description" class="form-control" rows="5">{{ job.job_description }}</textarea>
         </div>
-
-        <!-- Start Date -->
-
-        <div class="form-group">
-            <label><b>Start Date</b></label>
-
-            <input type="date"
-                   name="start_date"
-                   class="form-control"
-                   value="{{ job.start_date|date:'Y-m-d' }}">
+        <div>
+            <label>Start Date</label>
+            <input type="date" name="start_date" class="form-control" value="{{ job.start_date|date:'Y-m-d' }}">
         </div>
-
-        <!-- End Date -->
-
-        <div class="form-group">
-            <label><b>End Date</b></label>
-
-            <input type="date"
-                   name="end_date"
-                   class="form-control"
-                   value="{{ job.end_date|date:'Y-m-d' }}">
+        <div>
+            <label>End Date</label>
+            <input type="date" name="end_date" class="form-control" value="{{ job.end_date|date:'Y-m-d' }}">
         </div>
-
-        <!-- Current Company Logo -->
-
         {% if job.clogo %}
-        <div class="form-group">
-            <label><b>Current Company Logo</b></label><br>
-
-            <img src="{{ job.clogo.url }}"
-                 width="150"
-                 height="150"
-                 style="border:1px solid lightgray;">
+        <div class="full">
+            <label>Current logo</label><br>
+            <img src="{{ job.clogo.url }}" width="120" height="120" style="object-fit:cover;border-radius:10px;border:1px solid var(--cb-border);">
         </div>
         {% endif %}
-
-        <!-- Change Company Logo -->
-
-        <div class="form-group">
-            <label><b>Change Company Logo (Optional)</b></label>
-
-            <input type="file"
-                   name="clogo"
-                   class="form-control">
+        <div class="full">
+            <label>Change company logo (optional)</label>
+            <input type="file" name="clogo" class="form-control-file" accept="image/*">
         </div>
+    </div>
 
-        <br>
-
-        <button type="submit"
-                class="btn btn-primary">
-            Update Job
-        </button>
-
-        <a href="{% url 'Job_List' %}"
-           class="btn btn-secondary">
-            Cancel
-        </a>
-
-    </form>
-
+    <button type="submit" class="btn btn-primary mt-4">Update Job</button>
+    <a href="{% url 'Job_List' %}" class="btn btn-cb-outline mt-4 ml-2">Cancel</a>
+</form>
 </div>
 
-{% include 'footer.html' %}
+{% include 'Footer.html' %}
+<script src="{% static 'Job/js/category-cascade.js' %}?v=5"></script>
 
 {% if error == "no" %}
-<script>
-    alert("Job Details Updated Successfully");
-    window.location.href = "{% url 'Job_List' %}";
-</script>
+<script>alert("Job updated successfully"); window.location.href = "{% url 'Job_List' %}";</script>
 {% endif %}
-
 {% if error == "yes" %}
-<script>
-    alert("Something Went Wrong, Try Again...");
-</script>
+<script>alert("Something went wrong. Try again.");</script>
 {% endif %}
-
-{% endblock %}

@@ -1,0 +1,154 @@
+{% load static %}
+{% include 'Navigation.html' %}
+
+<div class="page-header"><h1>Ratings</h1></div>
+
+<div class="cb-page">
+    <div class="rating-summary cb-card mb-4">
+        <div class="rating-score">{% if rating_count %}{{ rating_avg }}{% else %}—{% endif %}</div>
+        <div class="rating-stars mt-2" aria-label="Average rating {{ rating_avg }} out of 5">
+            {% for i in "12345" %}
+                {% if rating_count and rating_avg >= forloop.counter %}
+                    <i class="fa fa-star"></i>
+                {% else %}
+                    <i class="fa fa-star-o"></i>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <p class="rating-count mb-0">
+            {% if rating_count %}
+                Based on {{ rating_count }} review{{ rating_count|pluralize }}
+            {% else %}
+                Be the first to rate CareerBridge
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="cb-auth-wrap-wide mx-auto" style="max-width:720px;">
+        {% if already_rated %}
+        <div class="cb-auth-card mb-4">
+            <h2>Share your experience</h2>
+            <p class="job-meta mb-0">You have already submitted a review. Thank you for your feedback.</p>
+        </div>
+        {% else %}
+        <form class="cb-auth-card mb-4" method="post" id="ratingForm">
+            {% csrf_token %}
+            <h2>Share your experience</h2>
+            <p class="job-meta mb-3">Rate CareerBridge and help others trust the platform.</p>
+
+            <label>Your rating</label>
+            <div class="star-picker" id="starPicker" role="radiogroup" aria-label="Star rating">
+                {% for i in "12345" %}
+                <label data-stars="{{ forloop.counter }}" title="{{ forloop.counter }} star{{ forloop.counter|pluralize }}">
+                    <input type="radio" name="stars" value="{{ forloop.counter }}" {% if forloop.first %}required{% endif %}>
+                    <i class="fa fa-star"></i>
+                </label>
+                {% endfor %}
+            </div>
+
+            <div class="cb-form-grid">
+                <div>
+                    <label for="display_name">Your name</label>
+                    <input type="text" id="display_name" name="display_name" class="form-control" required
+                           placeholder="Enter your full name"
+                           value="{% if request.user.is_authenticated %}{{ request.user.first_name|default:request.user.username }}{% endif %}">
+                </div>
+                <div>
+                    <label for="role">I am a</label>
+                    <select id="role" name="role" class="form-control" required>
+                        {% for value, label in role_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="full">
+                    <label for="comment">Your review</label>
+                    <textarea id="comment" name="comment" class="form-control" rows="4" maxlength="400" required
+                              placeholder="Write your review here"></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Submit rating</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <h2 class="mb-3" style="font-family:var(--font-display);font-size:1.5rem;">All reviews</h2>
+    {% if ratings %}
+    <div class="row">
+        {% for r in ratings %}
+        <div class="col-md-6 mb-3">
+            <div class="cb-card rating-card">
+                <p class="rating-name">{{ r.display_name }}</p>
+                <span class="rating-role">{{ r.role }}</span>
+                <div class="rating-stars" aria-label="{{ r.stars }} out of 5 stars">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= r.stars %}<i class="fa fa-star"></i>{% else %}<i class="fa fa-star-o"></i>{% endif %}
+                    {% endfor %}
+                </div>
+                <p class="rating-comment">{{ r.comment }}</p>
+                <p class="job-meta mt-2 mb-0" style="font-size:0.8rem;">{{ r.created_at|date:"M d, Y" }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state cb-card">No ratings yet. Your feedback will appear here.</div>
+    {% endif %}
+</div>
+
+{% include 'Footer.html' %}
+
+<script>
+(function () {
+    var picker = document.getElementById('starPicker');
+    if (!picker) return;
+    var labels = Array.prototype.slice.call(picker.querySelectorAll('label'));
+
+    function paint(n) {
+        labels.forEach(function (label) {
+            var s = parseInt(label.getAttribute('data-stars'), 10);
+            label.classList.toggle('active', s <= n);
+        });
+    }
+
+    labels.forEach(function (label) {
+        label.addEventListener('mouseenter', function () {
+            paint(parseInt(label.getAttribute('data-stars'), 10));
+        });
+        label.addEventListener('click', function () {
+            var input = label.querySelector('input');
+            input.checked = true;
+            paint(parseInt(label.getAttribute('data-stars'), 10));
+        });
+    });
+    picker.addEventListener('mouseleave', function () {
+        var checked = picker.querySelector('input:checked');
+        paint(checked ? parseInt(checked.value, 10) : 0);
+    });
+})();
+</script>
+
+{% if error == "noname" %}
+<script>alert("Please enter your name.");</script>
+{% endif %}
+{% if error == "nostars" %}
+<script>alert("Please choose a rating from 1 to 5 stars.");</script>
+{% endif %}
+{% if error == "nocomment" %}
+<script>alert("Please write your review.");</script>
+{% endif %}
+{% if error == "invalid" %}
+<script>alert("Please fill all required fields.");</script>
+{% endif %}
+{% if error == "exists" %}
+<script>alert("You have already submitted a review. Duplicate reviews are not allowed.");</script>
+{% endif %}
+{% if error == "done" %}
+<script>
+    alert("Thank you! Your rating has been submitted.");
+    if (window.history.replaceState) {
+        window.history.replaceState({}, document.title, "{% url 'Ratings' %}");
+    }
+</script>
+{% endif %}

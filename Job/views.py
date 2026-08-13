@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -8,20 +9,148 @@ from django.contrib import messages
 from rest_framework.response import Response
 #from rest_framework.authtoken.models import Token
 from django.http import HttpResponse, JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Avg, Count
 from django.db import transaction
-from .models import Job_Seeker, Company, Recruiter, Category, Job, Apply
+from .models import Job_Seeker, Company, Recruiter, Category, Job, Apply, SavedJob, PortalRating
 from datetime import date
 import random
+
+def _rating_summary():
+    _dedupe_portal_ratings()
+    agg = PortalRating.objects.aggregate(avg=Avg('stars'), count=Count('id'))
+    count = agg['count'] or 0
+    avg = agg['avg'] or 0
+    return {
+        'rating_avg': round(float(avg), 1) if count else 0,
+        'rating_count': count,
+        'featured_ratings': list(PortalRating.objects.all()[:3]),
+    }
+
+
+def _dedupe_portal_ratings():
+    """Keep one review per display name (and per logged-in user); delete the rest."""
+    seen_names = set()
+    seen_users = set()
+    for rating in PortalRating.objects.order_by('created_at', 'id'):
+        name_key = (rating.display_name or '').strip().lower()
+        is_dup = False
+        if name_key and name_key in seen_names:
+            is_dup = True
+        if rating.user_id and rating.user_id in seen_users:
+            is_dup = True
+        if is_dup:
+            rating.delete()
+            continue
+        if name_key:
+            seen_names.add(name_key)
+        if rating.user_id:
+            seen_users.add(rating.user_id)
+
+
+def _user_already_rated(request, display_name=''):
+    if request.user.is_authenticated and PortalRating.objects.filter(user=request.user).exists():
+        return True
+    name = (display_name or '').strip()
+    if name and PortalRating.objects.filter(display_name__iexact=name).exists():
+        return True
+    return False
+
+
+def _user_stats(job_seeker):
+    if not job_seeker:
+        return {}
+    apps = Apply.objects.filter(Job_seeker=job_seeker)
+    return {
+        'applications': apps.count(),
+        'pending': apps.filter(status='Pending').count(),
+        'accepted': apps.filter(status='Accepted').count(),
+        'rejected': apps.filter(status='Rejected').count(),
+        'saved': SavedJob.objects.filter(job_seeker=job_seeker).count(),
+    }
+
+def _company_stats(company):
+    if not company:
+        return {}
+    jobs = Job.objects.filter(Q(company=company) | Q(recruiter__company=company)).distinct()
+    apps = Apply.objects.filter(Q(job__company=company) | Q(job__recruiter__company=company)).distinct()
+    return {
+        'jobs': jobs.count(),
+        'applications': apps.count(),
+        'pending_recruiters': Recruiter.objects.filter(company=company, status='Pending').count(),
+        'accepted_recruiters': Recruiter.objects.filter(company=company, status='Accepted').count(),
+    }
+
+def _recruiter_stats(recruiter):
+    if not recruiter:
+        return {}
+    today = date.today()
+    jobs = Job.objects.filter(recruiter=recruiter)
+    return {
+        'jobs': jobs.count(),
+        'applications': Apply.objects.filter(job__recruiter=recruiter).count(),
+        'open_jobs': jobs.filter(end_date__gte=today).count(),
+    }
 
 from django.core.mail import send_mail
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    context = _rating_summary()
+    return render(request, 'index.html', context)
 
 def Contact(request):
     return render(request, 'Contact.html')
+
+def FAQ(request):
+    return render(request, 'FAQ.html')
+
+def Ratings(request):
+    if request.method == 'POST':
+        display_name = (request.POST.get('display_name') or '').strip()
+        role = request.POST.get('role') or 'Visitor'
+        comment = (request.POST.get('comment') or '').strip()
+        try:
+            stars = int(request.POST.get('stars') or 0)
+        except (TypeError, ValueError):
+            stars = 0
+
+        valid_roles = {c[0] for c in PortalRating.ROLE_CHOICES}
+        if role not in valid_roles:
+            role = 'Visitor'
+
+        if not display_name:
+            return redirect('/Ratings/?error=noname')
+        if stars < 1 or stars > 5:
+            return redirect('/Ratings/?error=nostars')
+        if not comment:
+            return redirect('/Ratings/?error=nocomment')
+
+        if _user_already_rated(request, display_name):
+            return redirect('/Ratings/?error=exists')
+
+        PortalRating.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            display_name=display_name,
+            role=role,
+            stars=stars,
+            comment=comment,
+        )
+        return redirect('/Ratings/?error=done')
+
+    error = request.GET.get('error', '')
+    already_rated = False
+    if request.user.is_authenticated and PortalRating.objects.filter(user=request.user).exists():
+        already_rated = True
+
+    summary = _rating_summary()
+    ratings = PortalRating.objects.all()
+    return render(request, 'Ratings.html', {
+        **summary,
+        'ratings': ratings,
+        'error': error,
+        'already_rated': already_rated,
+        'role_choices': PortalRating.ROLE_CHOICES,
+    })
 
 def User_login(request):
     return render(request, 'User_login.html')
@@ -78,8 +207,19 @@ def Company_login(request):
 def Company_home(request):
     return render(request, 'Company_home.html')
 
+def _company_signup_context(**extra):
+    sizes = [f'{start}-{start + 100}' for start in range(0, 2000, 100)]
+    sizes.append('2000+')
+    context = {
+        'company_size_choices': sizes,
+        'established_years': list(range(1945, 2081)),
+    }
+    context.update(extra)
+    return context
+
+
 def Company_Signup(request):
-    return render(request,'Company_Signup.html')
+    return render(request, 'Company_Signup.html', _company_signup_context())
 
 def Recruiter_login(request):
     return render(request, 'Recruiter_login.html')
@@ -270,11 +410,13 @@ def User_home(request):
 
             return render(request, 'User_home.html', {
                 'Job_Seeker': Job_seeker,
-                'error': 'no'
+                'error': 'no',
+                'stats': _user_stats(Job_seeker),
             })
 
         d = {
-            'Job_Seeker': Job_seeker
+            'Job_Seeker': Job_seeker,
+            'stats': _user_stats(Job_seeker),
         }
 
         return render(request, 'User_home.html', d)
@@ -282,7 +424,8 @@ def User_home(request):
     except Job_Seeker.DoesNotExist:
 
         return render(request, 'User_home.html', {
-            'error': 'yes'
+            'error': 'yes',
+            'stats': {},
         })
 #========================User_signup_api====================================
 @api_view(['POST'])
@@ -307,6 +450,7 @@ def User_signup_api(request):
 
         password = request.POST.get('pwd')
         gender = request.POST.get('Gender')
+        country = request.POST.get('country')
         state = request.POST.get('state')
         city = request.POST.get('city')
         image = request.FILES.get('Image')
@@ -343,6 +487,7 @@ def User_signup_api(request):
                 mobile=contact,
                 gender=gender,
                 image=image,
+                country=country,
                 state=state,
                 city=city,
                 Category=category_obj,
@@ -473,7 +618,8 @@ def Company_home(request):
     d = {
         'company': company,
         'error': error,
-        'updated': request.GET.get('updated')
+        'updated': request.GET.get('updated'),
+        'stats': _company_stats(company),
     }
 
     return render(request, 'Company_home.html', d)
@@ -498,10 +644,10 @@ def Company_Signup_api(request):
 
         # Get Form Data
 
-        company_name = request.POST.get('company_name')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
-        website = request.POST.get('website')
+        company_name = (request.POST.get('company_name') or '').strip()
+        email = (request.POST.get('Email') or request.POST.get('email') or '').strip()
+        phone = (request.POST.get('phone') or '').strip()
+        website = (request.POST.get('website') or '').strip()
         address = request.POST.get('address')
 
         country = request.POST.get('country')
@@ -509,67 +655,72 @@ def Company_Signup_api(request):
         city = request.POST.get('city')
 
         company_size = request.POST.get('company_size')
-        established_year = request.POST.get('established_year')
+        established_year = request.POST.get('established_year') or None
+        if established_year:
+            try:
+                established_year = int(established_year)
+            except (TypeError, ValueError):
+                established_year = None
 
         description = request.POST.get('description')
-
         password = request.POST.get('pwd')
-
+        confirm_password = request.POST.get('cpwd')
         company_logo = request.FILES.get('company_logo')
+
+        if website and not website.startswith(('http://', 'https://')):
+            website = 'https://' + website
+        if not website:
+            website = None
 
         print(company_name, email, password)
 
         # Validation
 
         if not company_name or not email or not password:
+            return render(request, 'Company_Signup.html', _company_signup_context(error='yes'))
 
-            return render(request, 'Company_Signup.html', {'error': 'yes'})
+        if confirm_password and password != confirm_password:
+            return render(request, 'Company_Signup.html', _company_signup_context(error='nomatch'))
 
         # Check Existing Company Email
 
         if User.objects.filter(username=email).exists():
 
-            return render(request, 'Company_Signup.html', {'error': 'exist'})
+            return render(request, 'Company_Signup.html', _company_signup_context(error='exist'))
 
-        # Create User
+        with transaction.atomic():
+            user = User.objects.create_user(
+                first_name=company_name,
+                username=email,
+                email=email,
+                password=password
+            )
 
-        user = User.objects.create_user(
-
-            first_name = company_name,
-            username = email,
-            email = email,
-            password = password
-
-        )
-
-        # Save Company Data
-
-        Company.objects.create(
-            User = user,
-            company_name = company_name,
-            email = email,
-            phone_no = phone,
-            website = website,
-            address = address,
-            country = country,
-            state = state,
-            city = city,
-            company_size = company_size,
-            established_year = established_year,
-            description=description,
-            company_logo = company_logo
-
-        )
+            Company.objects.create(
+                User=user,
+                company_name=company_name,
+                email=email,
+                phone_no=phone,
+                website=website,
+                address=address,
+                country=country,
+                state=state,
+                city=city,
+                company_size=company_size,
+                established_year=established_year,
+                description=description,
+                company_logo=company_logo
+            )
 
         # Success
 
-        return render(request, 'Company_Signup.html', {'error': 'no'})
+        return render(request, 'Company_Signup.html', _company_signup_context(error='no'))
 
     except Exception as e:
 
         print(e)
 
-        return render(request, 'Company_Signup.html', {'error': 'yes'})
+        return render(request, 'Company_Signup.html', _company_signup_context(error='yes'))
 #============================Change_passwordcompany=================
 def change_passwordcompany(request):
 
@@ -677,6 +828,7 @@ def Recruiter_Signup_api(request):
         contact_no = request.POST.get('contact_no')
         email = request.POST.get('Email')
         gender = request.POST.get('Gender')
+        country = request.POST.get('country')
         state = request.POST.get('state')
         city = request.POST.get('city')
         cname = request.POST.get('cname')
@@ -752,6 +904,7 @@ def Recruiter_Signup_api(request):
             contact_no=contact_no,
             email=email,
             gender=gender,
+            country=country,
             state=state,
             city=city,
             cname=cname,
@@ -860,10 +1013,9 @@ def Recruiter_home(request):
         error = "no"
 
     d = {
-
         'recruiter': recruiter,
-        'error': error
-
+        'error': error,
+        'stats': _recruiter_stats(recruiter),
     }
 
     return render(request,
@@ -896,7 +1048,7 @@ def Add_Job(request):
                 request.POST.get('category_type')
             )
 
-            Job.objects.create(
+            new_job = Job.objects.create(
                 company=posting_company,
                 recruiter=recruiter if is_recruiter_login else None,
                 job_title=request.POST.get('job_title'),
@@ -912,6 +1064,7 @@ def Add_Job(request):
                 clogo=request.FILES.get('clogo'),
                 creation_date=date.today()
             )
+            _notify_skill_match(new_job)
 
             error = "Done"
 
@@ -930,6 +1083,7 @@ def edit_jobdetails(request, pid):
         return redirect('Recruiter_login')
 
     recruiter = Recruiter.objects.filter(User=request.user).first()
+    company = Company.objects.filter(User=request.user).first()
     job = Job.objects.get(id=pid)
     error = ""
 
@@ -972,6 +1126,7 @@ def edit_jobdetails(request, pid):
         {
             'job': job,
             'recruiter': recruiter,
+            'company': company,
             'error': error
         }
     )
@@ -1020,19 +1175,99 @@ def delete_job(request, pid):
     job.delete()
     return redirect('Job_List')
 #===================Latest Job===============================
+def _filter_jobs(queryset, request):
+    """Server-side advanced filters for job listings."""
+    q = (request.GET.get('q') or '').strip()
+    location = (request.GET.get('location') or '').strip()
+    category = (request.GET.get('category') or '').strip()
+    experience = (request.GET.get('experience') or '').strip()
+    min_salary = (request.GET.get('min_salary') or '').strip()
+    max_salary = (request.GET.get('max_salary') or '').strip()
+
+    if q:
+        queryset = queryset.filter(
+            Q(job_title__icontains=q) |
+            Q(location__icontains=q) |
+            Q(company__company_name__icontains=q) |
+            Q(skills__icontains=q)
+        )
+    if location:
+        queryset = queryset.filter(location__icontains=location)
+    if category:
+        queryset = queryset.filter(
+            Q(category__Category__icontains=category) |
+            Q(category__Category_type__icontains=category)
+        )
+    if experience:
+        queryset = queryset.filter(experience=experience)
+    if min_salary.isdigit():
+        queryset = queryset.filter(max_salary__gte=int(min_salary))
+    if max_salary.isdigit():
+        queryset = queryset.filter(min_salary__lte=int(max_salary))
+    return queryset
+
+
+def _job_filter_context(request):
+    return {
+        'q': request.GET.get('q', ''),
+        'location': request.GET.get('location', ''),
+        'category': request.GET.get('category', ''),
+        'experience': request.GET.get('experience', ''),
+        'min_salary': request.GET.get('min_salary', ''),
+        'max_salary': request.GET.get('max_salary', ''),
+        'experience_choices': Job.EXPERIENCE_CHOICES,
+        'categories': Category.objects.all().order_by('Category_type'),
+    }
+
+
+def _notify_skill_match(job):
+    """Email seekers when a new job's skills overlap their profile keywords."""
+    raw = (job.skills or '')
+    tokens = [t.strip().lower() for t in raw.replace(';', ',').split(',') if t.strip()]
+    if not tokens:
+        return
+    seekers = Job_Seeker.objects.select_related('User', 'Category').all()
+    subject = f"New matching job: {job.job_title}"
+    for seeker in seekers:
+        hay = ' '.join(filter(None, [
+            seeker.category_type or '',
+            seeker.type or '',
+            getattr(seeker.Category, 'Category', '') if seeker.Category else '',
+            getattr(seeker.Category, 'Category_type', '') if seeker.Category else '',
+        ])).lower()
+        if not hay:
+            continue
+        if any(tok in hay for tok in tokens):
+            email = seeker.User.email or seeker.User.username
+            if not email or '@' not in email:
+                continue
+            try:
+                send_mail(
+                    subject,
+                    f"Hello {seeker.User.first_name or 'there'},\n\n"
+                    f"A new job may match your profile:\n"
+                    f"Title: {job.job_title}\n"
+                    f"Location: {job.location}\n"
+                    f"Skills: {job.skills}\n\n"
+                    f"Log in to CareerBridge to view and apply.\n",
+                    None,
+                    [email],
+                    fail_silently=True,
+                )
+            except Exception as e:
+                print('skill match email error', e)
+
+
 def Latest_Job(request):
     today = date.today()
     data = Job.objects.filter(
         start_date__lte=today,
         end_date__gte=today
     ).order_by('-start_date')
-    return render(
-        request,
-        'Latest_Job.html',
-        {
-            'data': data
-        }
-    )
+    data = _filter_jobs(data, request)
+    ctx = {'data': data}
+    ctx.update(_job_filter_context(request))
+    return render(request, 'Latest_Job.html', ctx)
 #==================Apply_Job=================================
 def Apply_job(request, pid):
     if not request.user.is_authenticated:
@@ -1198,18 +1433,22 @@ def User_latestjob(request):
         Q(start_date__lte=today, end_date__gte=today) |
         Q(id__in=applied_list)
     ).distinct().order_by('-start_date')
+    data = _filter_jobs(data, request)
 
-    return render(
-        request,
-        'User_latestjob.html',
-        {
-            'data': data,
-            'list': applied_list,
-            'job_seeker': job_seeker,
-            'user_profile': job_seeker,
-            'Job_Seeker': job_seeker
-        }
+    saved_ids = list(
+        SavedJob.objects.filter(job_seeker=job_seeker).values_list('job_id', flat=True)
     )
+
+    ctx = {
+        'data': data,
+        'list': applied_list,
+        'saved_ids': saved_ids,
+        'job_seeker': job_seeker,
+        'user_profile': job_seeker,
+        'Job_Seeker': job_seeker,
+    }
+    ctx.update(_job_filter_context(request))
+    return render(request, 'User_latestjob.html', ctx)
 #=====================job_details===============================
 def job_detail(request, pid):
     if not request.user.is_authenticated:
@@ -1220,6 +1459,9 @@ def job_detail(request, pid):
         return redirect('User_latestjob')   # if job not found
 
     job_seeker = Job_Seeker.objects.filter(User=request.user).first()
+    is_saved = False
+    if job_seeker and data:
+        is_saved = SavedJob.objects.filter(job_seeker=job_seeker, job=data).exists()
 
     return render(
         request,
@@ -1228,7 +1470,8 @@ def job_detail(request, pid):
             'data': data,
             'job_seeker': job_seeker,
             'user_profile': job_seeker,
-            'Job_Seeker': job_seeker
+            'Job_Seeker': job_seeker,
+            'is_saved': is_saved,
         }
     )
 #=================candidate_list================================
@@ -1310,7 +1553,58 @@ def candidate_list(request):
             'recruiter': recruiter,
             'company': company
         }
-    )     
+    )
+
+
+def update_application_status(request, id):
+    if not request.user.is_authenticated:
+        return redirect('Recruiter_login')
+
+    application = Apply.objects.filter(id=id).select_related('job', 'Job_seeker__User').first()
+    if not application:
+        return redirect('candidate_list')
+
+    recruiter = Recruiter.objects.filter(User=request.user).first()
+    company = Company.objects.filter(User=request.user).first()
+
+    allowed = False
+    if company and (
+        application.job.company_id == company.id or
+        (application.job.recruiter and application.job.recruiter.company_id == company.id)
+    ):
+        allowed = True
+    if recruiter and (
+        application.job.recruiter_id == recruiter.id or
+        (application.job.company_id and application.job.company_id == recruiter.company_id)
+    ):
+        allowed = True
+
+    if not allowed:
+        return redirect('candidate_list')
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status in ('Pending', 'Accepted', 'Rejected'):
+            application.status = new_status
+            application.save()
+            seeker_user = application.Job_seeker.User
+            email = seeker_user.email or seeker_user.username
+            if email and '@' in email:
+                try:
+                    send_mail(
+                        f"Application {new_status}: {application.job.job_title}",
+                        f"Hello {seeker_user.first_name or 'there'},\n\n"
+                        f"Your application for '{application.job.job_title}' "
+                        f"has been updated to: {new_status}.\n\n"
+                        f"Log in to CareerBridge to view details.\n",
+                        None,
+                        [email],
+                        fail_silently=True,
+                    )
+                except Exception as e:
+                    print('status email error', e)
+
+    return redirect('candidate_list')
 #========================Recruiter Manage=================================
 def Recruiter_pending(request):
     if not request.user.is_authenticated:
@@ -1607,3 +1901,48 @@ def verify_otp(request):
 
     print(request.session.items())
     return render(request, 'verify_otp.html')
+#================== My Applications / Saved Jobs ==================
+def My_Applications(request):
+    if not request.user.is_authenticated:
+        return redirect('User_login')
+    job_seeker = Job_Seeker.objects.filter(User=request.user).first()
+    if not job_seeker:
+        return redirect('User_login')
+    applications = Apply.objects.filter(Job_seeker=job_seeker).select_related(
+        'job', 'job__company'
+    ).order_by('-Date')
+    return render(request, 'My_Applications.html', {
+        'applications': applications,
+        'Job_Seeker': job_seeker,
+    })
+
+
+def Saved_Jobs(request):
+    if not request.user.is_authenticated:
+        return redirect('User_login')
+    job_seeker = Job_Seeker.objects.filter(User=request.user).first()
+    if not job_seeker:
+        return redirect('User_login')
+    saved = SavedJob.objects.filter(job_seeker=job_seeker).select_related(
+        'job', 'job__company'
+    ).order_by('-created_at')
+    return render(request, 'Saved_Jobs.html', {
+        'saved': saved,
+        'Job_Seeker': job_seeker,
+    })
+
+
+def toggle_save_job(request, pid):
+    if not request.user.is_authenticated:
+        return redirect('User_login')
+    job_seeker = Job_Seeker.objects.filter(User=request.user).first()
+    job = Job.objects.filter(id=pid).first()
+    if not job_seeker or not job:
+        return redirect('User_latestjob')
+    existing = SavedJob.objects.filter(job_seeker=job_seeker, job=job).first()
+    if existing:
+        existing.delete()
+    else:
+        SavedJob.objects.create(job_seeker=job_seeker, job=job)
+    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or '/User_latestjob'
+    return redirect(next_url)

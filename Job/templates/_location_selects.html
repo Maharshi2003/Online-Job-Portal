@@ -1,0 +1,30 @@
+{% load static %}
+<div>
+    <label>Country</label>
+    <select name="country" id="locCountry" class="form-control" required>
+        <option value="">Select your country</option>
+        <option value="India">India</option>
+        <option value="United States">United States</option>
+        <option value="United Kingdom">United Kingdom</option>
+        <option value="Canada">Canada</option>
+        <option value="Australia">Australia</option>
+        <option value="Germany">Germany</option>
+        <option value="Singapore">Singapore</option>
+        <option value="United Arab Emirates">United Arab Emirates</option>
+        <option value="Japan">Japan</option>
+        <option value="France">France</option>
+    </select>
+</div>
+<div>
+    <label>State</label>
+    <select name="state" id="locState" class="form-control" required disabled>
+        <option value="">Select your state</option>
+    </select>
+</div>
+<div>
+    <label>City</label>
+    <select name="city" id="locCity" class="form-control" required disabled>
+        <option value="">Select your city</option>
+    </select>
+</div>
+<script src="{% static 'Job/js/location-cascade.js' %}?v=2"></script>

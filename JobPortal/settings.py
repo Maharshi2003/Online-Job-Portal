@@ -89,6 +89,9 @@ DATABASES = {
     }
 }
 
+# Email: console backend prints messages in the runserver terminal (good for local testing).
+# For real Gmail delivery, set EMAIL_BACKEND to smtp, use your Gmail + App Password
+# via environment variables — never hardcode secrets in this file.
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

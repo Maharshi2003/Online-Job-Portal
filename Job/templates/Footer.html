@@ -1,76 +1,53 @@
-{% load static %} 
-
-<html>
-
-
-<!--<script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-</script>>-->
-
-<style>
-footer {
-    display: flex;
-    justify-content: center;   
-    align-items: center;    
-    height: 60px;
-    background-color: #53f373;
-}
-
-footer p {
-    font-weight: bold;
-    margin: 0;
-}
-</style>
-
-<div style="background-color : white ; width : 100% ; height : 350px" >
-
-<div class="container">
-    <div class="row">
-         <div class="col-md-4 mt-4">
-            <h3 class="text-left md-4">Contact Information</h3>
-
-        <p style="color:green; font-size:20px">
-            <i class="fa fa-map-marker text-danger mr-2"></i>
-            SP RingRoad Ahmedabad
-        </p>
-
-        <p style="color:green; font-size:20px">
-            <i class="fa fa-envelope text-danger mr-2"></i>
-            mehtamaharshi510@gmail.com
-        </p>
-
-        <p style="color:green; font-size:20px">
-            <i class="fa fa-mobile text-danger mr-2"></i>
-            +91 9375812901
-        </p>
-
-        <p style="color:green; font-size:20px">
-            <i class="fa fa-globe text-danger mr-2"></i>
-            www.pankajpatelsoftware.com
-        </p>
-
+{% load static %}
+<div class="site-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h3>Contact Information</h3>
+                <p class="footer-text"><i class="fa fa-map-marker text-danger mr-2"></i>SP RingRoad Ahmedabad</p>
+                <p class="footer-text"><i class="fa fa-envelope text-danger mr-2"></i>maharshimehta2331@gmail.com</p>
+                <p class="footer-text"><i class="fa fa-mobile text-danger mr-2"></i>+91 9375812901</p>
+                <p class="footer-text"><i class="fa fa-globe text-danger mr-2"></i>www.pankajpatelsoftware.com</p>
             </div>
-
-            <div class="col-md-4 mt-4">
-                <h3 class="text-black">Online Placement</h3>
-                <p style="color: green ; font-size:20px">An Employment website is a website that deals specially with employement  or careers.
-                    Many employment website are designed to allow employer to post job recruitment for a Posotion to be field  and are commonly 
-                    known as a job boards</p>
+            <div class="col-md-4 mb-4">
+                <h3>Online Placement</h3>
+                <p class="footer-text">An employment website that helps employers post openings and job seekers find careers. CareerBridge connects talent with opportunity.</p>
             </div>
-           <div class="col-md-4 mt-4">
-                <h3 class="text-black">Query Letter</h3>
-                <p style="color:green ; font-size:20px">If you want to ask any extra Information then send me on Email ID</p>
-                <form method="post" class="form-inline">
-                    {%csrf_token%}
-                    <input type="Email" name="emailid" placeholder="Email Id" required class="form-control mr-2">
-                    <input type="submit" value="send" class="btn btn-primary">
+            <div class="col-md-4 mb-4">
+                <h3>Query Letter</h3>
+                <p class="footer-text">If you want to ask any extra information, enter an email and send via Gmail.</p>
+                <form id="footerMailForm" class="form-inline" action="#" onsubmit="return openComposeMail(event)">
+                    <input type="email" id="footerEmailInput" name="emailid" placeholder="Email Id" required class="form-control mr-2 mb-2 footer-email-input cb-email-input">
+                    <button type="submit" class="btn btn-primary mb-2">Send via Gmail</button>
                 </form>
-           </div>
-          
-           <footer style="text-align:center">
-                <p style="font-weight:bold"><b>© 2026 Online Job Portal Solution. All Rights Reserved.</b></p>
-            </footer>
-         </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        © 2026-2027 Online Job Portal Solution. All Rights Reserved.
     </div>
 </div>
-</html>         
+<script>
+function openComposeMail(event) {
+    event.preventDefault();
+    var emailInput = document.getElementById("footerEmailInput");
+    var email = (emailInput.value || "").trim();
+    var subject = "Query from CareerBridge Job Portal";
+    var body = "Hello,\n\n";
+    if (!email) {
+        emailInput.focus();
+        return false;
+    }
+    if (/[A-Z]/.test(email) || !/^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/.test(email)) {
+        emailInput.classList.add('cb-email-error');
+        emailInput.focus();
+        return false;
+    }
+    var composeUrl = "https://mail.google.com/mail/?view=cm&fs=1"
+        + "&to=" + encodeURIComponent(email)
+        + "&su=" + encodeURIComponent(subject)
+        + "&body=" + encodeURIComponent(body);
+    window.open(composeUrl, "_blank");
+    return false;
+}
+</script>

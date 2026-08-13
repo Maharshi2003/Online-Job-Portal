@@ -1,600 +1,101 @@
 {% load static %}
-
-{% block body %}
-
 {% include 'Navigation.html' %}
 
-<script>
+<div class="page-header"><h1>Company Signup</h1></div>
 
-    function checkpass()
-    {
-        if(document.companysignup.pwd.value != document.companysignup.cpwd.value)
-        {
-            alert('Password Does not Match');
-            document.companysignup.cpwd.focus();
-            return false;
-        }
-        return true;
-    }
+<div class="cb-auth-wrap-wide">
+<form class="cb-auth-card" name="companysignup" method="post" action="{% url 'Company_Signup_api' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2>Register your company</h2>
 
-    // Show Hide Password
+    <div class="cb-form-grid">
+        <div>
+            <label>Company Name</label>
+            <input type="text" name="company_name" class="form-control" placeholder="Enter company name" required>
+        </div>
+        <div>
+            <label>Email</label>
+            <input type="email" name="Email" class="form-control cb-email-input" placeholder="Enter company email" required>
+        </div>
+        <div>
+            <label>Phone</label>
+            <input type="text" name="phone" class="form-control" placeholder="Enter phone number" required>
+        </div>
+        <div>
+            <label>Website</label>
+            <input type="text" name="website" class="form-control" placeholder="https://www.example.com">
+        </div>
+        <div class="full">
+            <label>Address</label>
+            <input type="text" name="address" class="form-control" placeholder="Enter company address" required>
+        </div>
+        {% include '_location_selects.html' %}
+        <div>
+            <label>Company Size</label>
+            <select name="company_size" class="form-control" required>
+                <option value="">Select company size</option>
+                {% for size in company_size_choices %}
+                <option value="{{ size }}">{{ size }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label>Established Year</label>
+            <select name="established_year" class="form-control" required>
+                <option value="">Select established year</option>
+                {% for year in established_years %}
+                <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label>Password</label>
+            <div class="cb-password-field">
+                <input type="password" name="pwd" class="form-control" placeholder="Create a password" required autocomplete="new-password">
+                <button type="button" class="cb-password-toggle" aria-label="Show password" title="Show password">
+                    <i class="fa fa-eye"></i>
+                </button>
+            </div>
+        </div>
+        <div>
+            <label>Confirm Password</label>
+            <div class="cb-password-field">
+                <input type="password" name="cpwd" class="form-control" placeholder="Re-enter your password" required autocomplete="new-password">
+                <button type="button" class="cb-password-toggle" aria-label="Show password" title="Show password">
+                    <i class="fa fa-eye"></i>
+                </button>
+            </div>
+        </div>
+        <div class="full">
+            <label>Description</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Briefly describe your company"></textarea>
+        </div>
+        <div class="full">
+            <label>Company Logo</label>
+            <input type="file" name="company_logo" class="form-control-file" accept="image/*" title="Choose company logo">
+            <small class="form-text text-muted">Choose a company logo (optional)</small>
+        </div>
+    </div>
 
-    function togglePassword()
-    {
-        var x = document.getElementById("pwd");
-        var y = document.getElementById("eyeicon1");
-
-        if(x.type === "password")
-        {
-            x.type = "text";
-            y.classList.remove("fa-eye");
-            y.classList.add("fa-eye-slash");
-        }
-        else
-        {
-            x.type = "password";
-            y.classList.remove("fa-eye-slash");
-            y.classList.add("fa-eye");
-        }
-    }
-
-    function toggleConfirmPassword()
-    {
-        var x = document.getElementById("cpwd");
-        var y = document.getElementById("eyeicon2");
-
-        if(x.type === "password")
-        {
-            x.type = "text";
-            y.classList.remove("fa-eye");
-            y.classList.add("fa-eye-slash");
-        }
-        else
-        {
-            x.type = "password";
-            y.classList.remove("fa-eye-slash");
-            y.classList.add("fa-eye");
-        }
-    }
-
-    // Country -> State -> City Dropdown
-
-    function updateStates()
-    {
-        var country = document.getElementById("country").value;
-
-        var stateDropdown = document.getElementById("state");
-        var cityDropdown = document.getElementById("city");
-
-        stateDropdown.innerHTML = '<option value="">Select State</option>';
-        cityDropdown.innerHTML = '<option value="">Select City</option>';
-
-        var states = {
-
-            "India": [
-                "Gujarat",
-                "Maharashtra",
-                "Rajasthan"
-            ],
-
-            "USA": [
-                "California",
-                "Texas",
-                "Florida"
-            ]
-        };
-
-        if(country in states)
-        {
-            states[country].forEach(function(state)
-            {
-                var option = document.createElement("option");
-
-                option.value = state;
-                option.text = state;
-
-                stateDropdown.appendChild(option);
-            });
-        }
-    }
-
-    function updateCities()
-    {
-        var state = document.getElementById("state").value;
-
-        var cityDropdown = document.getElementById("city");
-
-        cityDropdown.innerHTML = '<option value="">Select City</option>';
-
-        var cities = {
-
-            "Gujarat": [
-                "Ahmedabad",
-                "Surat",
-                "Vadodara",
-                "Rajkot"
-            ],
-
-            "Maharashtra": [
-                "Mumbai",
-                "Pune",
-                "Nagpur"
-            ],
-
-            "Rajasthan": [
-                "Jaipur",
-                "Udaipur",
-                "Jodhpur"
-            ],
-
-            "California": [
-                "Los Angeles",
-                "San Diego"
-            ],
-
-            "Texas": [
-                "Houston",
-                "Dallas"
-            ],
-
-            "Florida": [
-                "Miami",
-                "Orlando"
-            ]
-        };
-
-        if(state in cities)
-        {
-            cities[state].forEach(function(city)
-            {
-                var option = document.createElement("option");
-
-                option.value = city;
-                option.text = city;
-
-                cityDropdown.appendChild(option);
-            });
-        }
-    }
-
-</script>
-
-<style>
-
-.custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
-
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite;
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-</style>
-
-<div class="custom-marquee">
-    <span>Company Signup</span>
+    <input type="submit" value="Submit" class="btn btn-primary mt-4">
+    <p class="mt-3 mb-0">Already registered? <a href="{% url 'Company_login' %}" style="color:var(--cb-green);font-weight:700;">Login</a></p>
+</form>
 </div>
 
-<hr>
-
-<form id="companySignupForm"
-      class="container mt-5"
-      onsubmit="return checkpass();"
-      name="companysignup"
-      method="POST"
-      action="{% url 'Company_Signup_api' %}"
-      enctype="multipart/form-data">
-
-    {% csrf_token %}
-
-    <!-- Company Name -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-            <label>
-                <i class="fa fa-building mr-2"></i>
-                <b>Company Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="company_name"
-                   placeholder="Enter Company Name"
-                   required>
-        </div>
-
-    </div>
-
-    <!-- Email and Phone -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-envelope mr-2"></i>
-                <b>Email</b>
-            </label>
-
-            <!--<input type="email"
-                   class="form-control"
-                   name="email"
-                   placeholder="Enter Email"
-                   required>-->        
-    <div class="input-group">
-
-        <input type="text"
-               class="form-control"
-               name="Email"
-               placeholder="Enter Gmail Address"
-               required>
-
-        <!--<div class="input-group-append">
-            <span class="input-group-text"
-                  style="background-color:#f8f9fa;font-weight:bold;">
-                @gmail.com
-            </span>
-        </div>-->
-
-    </div>
-
-        </div>
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-phone mr-2"></i>
-                <b>Phone Number</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="phone"
-                   placeholder="Enter Phone Number"
-                   required>
-
-        </div>
-
-    </div>
-
-    <!-- Website -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-globe mr-2"></i>
-                <b>Website Link</b>
-            </label>
-
-            <input type="url"
-                   class="form-control"
-                   name="website"
-                   placeholder="https://example.com">
-
-        </div>
-
-    </div>
-
-    <!-- Address -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-map-marker mr-2"></i>
-                <b>Address</b>
-            </label>
-
-            <textarea class="form-control"
-                      name="address"
-                      rows="3"
-                      placeholder="Enter Company Address"
-                      required></textarea>
-
-        </div>
-
-    </div>
-
-    <!-- Country State City -->
-
-    <div class="form-row">
-
-        <!-- Country -->
-
-        <div class="form-group col-md-4">
-
-            <label>
-                <i class="fa fa-globe mr-2"></i>
-                <b>Country</b>
-            </label>
-
-            <select class="form-control"
-                    id="country"
-                    name="country"
-                    onchange="updateStates()"
-                    required>
-
-                <option value="">Select Country</option>
-
-                <option value="India">India</option>
-
-                <option value="USA">USA</option>
-
-            </select>
-
-        </div>
-
-        <!-- State -->
-
-        <div class="form-group col-md-4">
-
-            <label>
-                <i class="fa fa-map mr-2"></i>
-                <b>State</b>
-            </label>
-
-            <select class="form-control"
-                    id="state"
-                    name="state"
-                    onchange="updateCities()"
-                    required>
-
-                <option value="">Select State</option>
-
-            </select>
-
-        </div>
-
-        <!-- City -->
-
-        <div class="form-group col-md-4">
-
-            <label>
-                <i class="fa fa-building-o mr-2"></i>
-                <b>City</b>
-            </label>
-
-            <select class="form-control"
-                    id="city"
-                    name="city"
-                    required>
-
-                <option value="">Select City</option>
-
-            </select>
-
-        </div>
-
-    </div>
-
-    <!-- Company Size and Established Year -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-users mr-2"></i>
-                <b>Company Size</b>
-            </label>
-
-            <select class="form-control"
-                    name="company_size"
-                    required>
-
-                <option value="">Select Company Size</option>
-
-                <option value="1-10">1-10 Employees</option>
-
-                <option value="11-50">11-50 Employees</option>
-
-                <option value="51-200">51-200 Employees</option>
-
-                <option value="201-500">201-500 Employees</option>
-
-                <option value="500+">500+ Employees</option>
-
-            </select>
-
-        </div>
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-calendar mr-2"></i>
-                <b>Established Year</b>
-            </label>
-
-            <select class="form-control"
-            name="established_year"
-            required>
-
-        <option value="">Select Established Year</option>
-
-        <script>
-            for(var year = 2060; year >= 1930; year--)
-            {
-                document.write(
-                    '<option value="' + year + '">' + year + '</option>'
-                );
-            }
-        </script>
-
-    </select>
-        </div>
-
-    </div>
-
-    <!-- Password -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-key mr-2"></i>
-                <b>Password</b>
-            </label>
-
-            <div class="input-group">
-
-                <input type="password"
-                       class="form-control"
-                       id="pwd"
-                       name="pwd"
-                       placeholder="Enter Password"
-                       required>
-
-                <div class="input-group-append">
-
-                    <span class="input-group-text"
-                          onclick="togglePassword()"
-                          style="cursor:pointer;">
-
-                        <i class="fa fa-eye" id="eyeicon1"></i>
-
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- Confirm Password -->
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-unlock mr-2"></i>
-                <b>Confirm Password</b>
-            </label>
-
-            <div class="input-group">
-
-                <input type="password"
-                       class="form-control"
-                       id="cpwd"
-                       name="cpwd"
-                       placeholder="Confirm Password"
-                       required>
-
-                <div class="input-group-append">
-
-                    <span class="input-group-text"
-                          onclick="toggleConfirmPassword()"
-                          style="cursor:pointer;">
-
-                        <i class="fa fa-eye" id="eyeicon2"></i>
-
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Description -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-file-text mr-2"></i>
-                <b>Description</b>
-            </label>
-
-            <textarea class="form-control"
-                      name="description"
-                      rows="4"
-                      placeholder="Enter Company Description"
-                      required></textarea>
-
-        </div>
-
-    </div>
-
-    <!-- Company Logo -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-image mr-2"></i>
-                <b>Company Logo</b>
-            </label>
-
-            <input type="file"
-                   class="form-control"
-                   name="company_logo"
-                   required>
-
-        </div>
-
-    </div>
-
-    <!-- Submit Button -->
-
-    <input type="submit"
-           value="Submit"
-           class="btn btn-primary">
-
-</form>
+{% include 'Footer.html' %}
 
 {% if error == "exist" %}
-
-<script>
-    alert("Email Already Exists");
-</script>
-
+<script>alert("Email already exists!");</script>
 {% endif %}
 {% if error == "no" %}
-
 <script>
-
-    alert("Company Registered Successfully");
-
-    window.location.href = "/Company_login/";
-
+    alert("Registration successful!");
+    window.location = "{% url 'Company_login' %}";
 </script>
-
 {% endif %}
-
+{% if error == "nomatch" %}
+<script>alert("Password and Confirm Password do not match.");</script>
+{% endif %}
 {% if error == "yes" %}
-
-<script>
-    alert("Something Went Wrong, Try Again...");
-</script>
-
+<script>alert("Something went wrong. Please try again.");</script>
 {% endif %}
-
-{% endblock %}

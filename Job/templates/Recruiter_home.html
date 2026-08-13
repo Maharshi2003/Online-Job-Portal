@@ -1,433 +1,90 @@
 {% load static %}
-
-{% block body %}
-
 {% include 'Recruiter_navigation.html' %}
 
-<style>
-.custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
+<div class="page-header"><h1>Recruiter Profile</h1></div>
 
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite;
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-</style>
-
-<div class="custom-marquee">
-    <span> Recruiter Profile </span>
+<div class="cb-page">
+{% if stats %}
+<div class="stats-strip">
+    <div class="stat-card"><div class="stat-label">My Jobs</div><div class="stat-value">{{ stats.jobs }}</div></div>
+    <div class="stat-card"><div class="stat-label">Applications</div><div class="stat-value">{{ stats.applications }}</div></div>
+    <div class="stat-card"><div class="stat-label">Open Jobs</div><div class="stat-value">{{ stats.open_jobs }}</div></div>
 </div>
+{% endif %}
 
-<hr>
-
-<div class="container">
+<form class="cb-auth-card" name="recruiterprofile" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2>Profile details</h2>
 
     <div class="row">
-
-        <div class="col-sm-12">
-
-<form class="mt-5"
-      name="recruiterprofile"
-      method="POST"
-      enctype="multipart/form-data">
-
-    {% csrf_token %}
-
-    <!-- First Name and Last Name -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-user mr-2"></i>
-                <b>First Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   value="{{recruiter.first_name}}"
-                   readonly>
-
+        <div class="col-md-8">
+            <div class="cb-form-grid">
+                <div>
+                    <label>First Name</label>
+                    <input type="text" class="form-control" value="{{ recruiter.first_name }}" readonly>
+                </div>
+                <div>
+                    <label>Last Name</label>
+                    <input type="text" class="form-control" value="{{ recruiter.last_name }}" readonly>
+                </div>
+                <div>
+                    <label>Contact</label>
+                    <input type="text" class="form-control" value="{{ recruiter.contact_no }}" readonly>
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input type="email" class="form-control" value="{{ recruiter.email }}" readonly>
+                </div>
+                <div class="full">
+                    <label>Company Name</label>
+                    <input type="text" class="form-control" value="{{ recruiter.cname }}" readonly>
+                </div>
+                <div>
+                    <label>State</label>
+                    <input type="text" class="form-control" value="{{ recruiter.state }}" readonly>
+                </div>
+                <div>
+                    <label>City</label>
+                    <input type="text" class="form-control" value="{{ recruiter.city }}" readonly>
+                </div>
+                <div class="full">
+                    <label>Gender</label>
+                    <div>
+                        <label class="mr-3"><input type="radio" name="Gender" value="Male" {% if recruiter.gender == "Male" %}checked{% endif %}> Male</label>
+                        <label><input type="radio" name="Gender" value="Female" {% if recruiter.gender == "Female" %}checked{% endif %}> Female</label>
+                    </div>
+                </div>
+                <div>
+                    <label>Change profile image</label>
+                    <input type="file" class="form-control-file" name="recruiter_image" accept="image/*">
+                </div>
+                <div>
+                    <label>Change company logo</label>
+                    <input type="file" class="form-control-file" name="clogo" accept="image/*">
+                </div>
+            </div>
+            <input type="submit" value="Update Profile" class="btn btn-primary mt-4">
         </div>
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-user mr-2"></i>
-                <b>Last Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   value="{{recruiter.last_name}}"
-                   readonly>
-
-        </div>
-
-    </div>
-
-    <!-- Contact Number -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-phone-square mr-2"></i>
-                <b>Contact No</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   value="{{recruiter.contact_no}}"
-                   readonly>
-
-        </div>
-
-    </div>
-
-    <!-- Email -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-envelope mr-2"></i>
-                <b>Email ID</b>
-            </label>
-
-            <input type="email"
-                   class="form-control"
-                   value="{{recruiter.email}}"
-                   readonly>
-
-        </div>
-
-    </div>
-
-    <!-- Change Recruiter Image -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-image mr-2"></i>
-                <b>Change Recruiter Image</b>
-            </label>
-
-            <input type="file"
-                   class="form-control"
-                   name="recruiter_image"
-                   accept="image/*">
-
-        </div>
-
-        <!--Recruiter Image-->
-
-        <div class="col-sm-4 mt-5 text-center">
-
+        <div class="col-md-4 text-center mt-3 mt-md-0">
             {% if recruiter.recruiter_image %}
-
-            <img src="{{recruiter.recruiter_image.url}}"
-                 width="300px"
-                 height="300px"
-                 style="
-                    border-radius:10px;
-                    border:2px solid lightgray;
-                    object-fit:cover;
-                 ">
-
-            {% else %}
-
-            <img src="{% static 'images/default_user.png' %}"
-                 width="300px"
-                 height="300px"
-                 style="
-                    border-radius:10px;
-                    border:2px solid lightgray;
-                    object-fit:cover;
-                 ">
-
+            <img src="{{ recruiter.recruiter_image.url }}" width="180" height="180" alt="" class="mb-3" style="border-radius:12px;object-fit:cover;border:1px solid var(--cb-border);">
             {% endif %}
-
-        </div>
-
-    </div>
-    <br>
-
-    <!-- Gender -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label><b>Gender</b></label>
-
-            {% if recruiter.gender == "Male" %}
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="male"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Male"
-                       checked>
-
-                <label class="custom-control-label" for="male">
-                    <i class="fa fa-male mr-2"></i>
-                    Male
-                </label>
-
-            </div>
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="female"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Female">
-
-                <label class="custom-control-label" for="female">
-                    <i class="fa fa-female mr-2"></i>
-                    Female
-                </label>
-
-            </div>
-
-            {% else %}
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="male"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Male">
-
-                <label class="custom-control-label" for="male">
-                    <i class="fa fa-male mr-2"></i>
-                    Male
-                </label>
-
-            </div>
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="female"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Female"
-                       checked>
-
-                <label class="custom-control-label" for="female">
-                    <i class="fa fa-female mr-2"></i>
-                    Female
-                </label>
-
-            </div>
-
+            {% if recruiter.clogo %}
+            <img src="{{ recruiter.clogo.url }}" width="180" height="180" alt="" style="border-radius:12px;object-fit:cover;border:1px solid var(--cb-border);">
             {% endif %}
-
         </div>
-
-        <!--Recruiter Image 
-
-        <div class="col-sm-4 mt-5 text-center">
-
-            {% if recruiter.recruiter_image %}
-
-            <img src="{{recruiter.recruiter_image.url}}"
-                 width="300px"
-                 height="300px"
-                 style="
-                    border-radius:10px;
-                    border:2px solid lightgray;
-                    object-fit:cover;
-                 ">
-
-            {% else %}
-
-            <img src="{% static 'images/default_user.png' %}"
-                 width="300px"
-                 height="300px"
-                 style="
-                    border-radius:10px;
-                    border:2px solid lightgray;
-                    object-fit:cover;
-                 ">
-
-            {% endif %}
-
-        </div>-->
-
     </div>
-
-    <!-- Company Name -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-building mr-2"></i>
-                <b>Company Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   value="{{recruiter.cname}}"
-                   readonly>
-
-        </div>
-
-    </div>
-
-    <!-- State and City -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-map mr-2"></i>
-                <b>State</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   value="{{recruiter.state}}"
-                   readonly>
-
-        </div>
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-building-o mr-2"></i>
-                <b>City</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   value="{{recruiter.city}}"
-                   readonly>
-
-        </div>
-
-    </div>
-
-    <!-- Change Company Logo -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-picture-o mr-2"></i>
-                <b>Change Company Logo</b>
-            </label>
-
-            <input type="file"
-                   class="form-control"
-                   name="clogo"
-                   accept="image/*">
-
-        </div>
-
-    </div>
-
-    <!-- Company Logo -->
-
-    <div class="col-sm-4 mt-4 text-center">
-
-        {% if recruiter.clogo %}
-
-        <img src="{{recruiter.clogo.url}}"
-             width="300px"
-             height="300px"
-             style="
-                border-radius:10px;
-                border:2px solid lightgray;
-                object-fit:cover;
-             ">
-
-        {% else %}
-
-        <img src="{% static 'images/default_company.png' %}"
-             width="300px"
-             height="300px"
-             style="
-                border-radius:10px;
-                border:2px solid lightgray;
-                object-fit:cover;
-             ">
-
-        {% endif %}
-
-    </div>
-
-    <br><br>
-
-    <input type="submit"
-           value="Update Profile"
-           class="btn btn-primary">
-
 </form>
-
 </div>
 
-</div>
-
-</div>
-
-{% include 'footer.html' %}
+{% include 'Footer.html' %}
 
 {% if error == "no" %}
-
-<script>
-
-    alert("Recruiter Profile Updated Successfully");
-
-    window.location.href = "{% url 'Recruiter_home' %}";
-
-</script>
+<script>alert("Recruiter profile updated successfully"); window.location.href = "{% url 'Recruiter_home' %}";</script>
 {% endif %}
 {% if error == "yes" %}
-<script>
-    alert("Something Went Wrong, Try Again...");
-</script>
-
+<script>alert("Something went wrong. Try again.");</script>
+{% endif %}
 {% if error == "not_recruiter" %}
-<script>
-    alert("Only Recruiters can login here.");
-</script>
+<script>alert("Only recruiters can login here.");</script>
 {% endif %}
-
-{% endif %}
-
-{% endblock %}

@@ -27,6 +27,8 @@ urlpatterns = [
     #path('api/', include('api.urls')),
     path('',index, name="index"),
     path('Contact',Contact, name="Contact"),
+    path('FAQ', FAQ, name="FAQ"),
+    path('Ratings/', Ratings, name="Ratings"),
     path('User_login/',User_login, name="User_login"),
     path('User_home/', User_home, name="User_home"),
     path('User_login_api/', User_login_api, name='User_login_api'),
@@ -70,6 +72,11 @@ urlpatterns = [
     path('delete_Recruiter/<int:id>/', delete_Recruiter, name='delete_Recruiter'),
     path('View_Users',View_Users,name="View_Users"),
     
+    path('My_Applications/', My_Applications, name='My_Applications'),
+    path('Saved_Jobs/', Saved_Jobs, name='Saved_Jobs'),
+    path('toggle_save_job/<int:pid>/', toggle_save_job, name='toggle_save_job'),
+    path('update_application_status/<int:id>/', update_application_status, name='update_application_status'),
+
     path('forgot_password/', forgot_password, name='forgot_password'),
     path('reset_password/<int:user_id>/', reset_password, name='reset_password'),
     path('verify_otp/', verify_otp, name='verify_otp'),

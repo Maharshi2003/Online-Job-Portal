@@ -1,0 +1,29 @@
+{% load static %}
+{% include 'User_navigation.html' %}
+<div class="page-header"><h1>Saved Jobs</h1></div>
+<div class="container mt-4 mb-5">
+{% if saved %}
+{% for item in saved %}
+<div class="job-card">
+    <div class="d-flex justify-content-between align-items-start flex-wrap">
+        <div>
+            <h3>{{ item.job.job_title }}</h3>
+            <p class="job-meta mb-2">
+                <i class="fa fa-building mr-1"></i>{{ item.job.company.company_name|default:"—" }}
+                &nbsp;·&nbsp;
+                <i class="fa fa-map-marker mr-1"></i>{{ item.job.location }}
+            </p>
+            <p class="job-meta mb-0">Saved on {{ item.created_at|date:"M d, Y" }}</p>
+        </div>
+        <div class="mt-2">
+            <a href="{% url 'job_detail' item.job.id %}" class="btn btn-primary btn-sm">View</a>
+            <a href="{% url 'toggle_save_job' item.job.id %}?next={% url 'Saved_Jobs' %}" class="btn btn-outline-danger btn-sm">Remove</a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state cb-card">No saved jobs yet. Bookmark roles from the <a href="{% url 'User_latestjob' %}">Jobs List</a>.</div>
+{% endif %}
+</div>
+{% include 'Footer.html' %}

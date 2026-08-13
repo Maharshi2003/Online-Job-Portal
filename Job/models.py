@@ -12,6 +12,16 @@ class Category(models.Model):
         ('Senior Developer', 'Senior Developer'),
         ('Fresher', 'Fresher'),
         ('AI/ML Intern', 'AI/ML Intern'),
+        ('Software Development', 'Software Development'),
+        ('Web Development', 'Web Development'),
+        ('Data Science & AI', 'Data Science & AI'),
+        ('Cloud & DevOps', 'Cloud & DevOps'),
+        ('Cybersecurity & IT Support', 'Cybersecurity & IT Support'),
+        ('Human Resources', 'Human Resources'),
+        ('Marketing & Sales', 'Marketing & Sales'),
+        ('Finance & Accounting', 'Finance & Accounting'),
+        ('Operations & Administration', 'Operations & Administration'),
+        ('Design & Content', 'Design & Content'),
     )
     Category = models.CharField(
         max_length=100,
@@ -29,6 +39,7 @@ class Category(models.Model):
 class Job_Seeker(models.Model):
     User = models.OneToOneField(User,on_delete=models.CASCADE)
     mobile = models.CharField(max_length=15, null=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
     state = models.CharField(max_length=100, null=True, blank=True)
     image = models.FileField(null=True)
@@ -83,13 +94,6 @@ class Company(models.Model):
     )
     company_size = models.CharField(
         max_length=50,
-        choices=[
-            ('1-10', '1-10 Employees'),
-            ('11-50', '11-50 Employees'),
-            ('51-200', '51-200 Employees'),
-            ('201-500', '201-500 Employees'),
-            ('500+', '500+ Employees'),
-        ],
         null=True,
         blank=True
     )
@@ -115,6 +119,7 @@ class Recruiter(models.Model):
     contact_no = models.CharField(max_length=15)
     email = models.EmailField()
     gender = models.CharField(max_length=20)
+    country = models.CharField(max_length=100, null=True, blank=True)
     state = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     recruiter_image = models.FileField(upload_to='recruiterimage/', null=True, blank=True)
@@ -204,10 +209,49 @@ class Job(models.Model):
         return self.job_title
 #=============================Apply==================================
 class Apply(models.Model):
-   job = models.ForeignKey(Job,on_delete=models.CASCADE)
-   Job_seeker = models.ForeignKey(Job_Seeker,on_delete=models.CASCADE)
-   Resume = models.FileField(null=True)
-   Date = models.DateField() 
-   
-   def __str__(self):
-      return self.job_job.title
+    STATUS_CHOICES = (
+        ('Pending', 'Pending'),
+        ('Accepted', 'Accepted'),
+        ('Rejected', 'Rejected'),
+    )
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    Job_seeker = models.ForeignKey(Job_Seeker, on_delete=models.CASCADE)
+    Resume = models.FileField(null=True)
+    Date = models.DateField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+
+    def __str__(self):
+        return self.job.job_title
+
+
+class SavedJob(models.Model):
+    job_seeker = models.ForeignKey(Job_Seeker, on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('job_seeker', 'job')
+
+    def __str__(self):
+        return f'{self.job_seeker} saved {self.job.job_title}'
+
+
+class PortalRating(models.Model):
+    ROLE_CHOICES = (
+        ('Job Seeker', 'Job Seeker'),
+        ('Company', 'Company'),
+        ('Recruiter', 'Recruiter'),
+        ('Visitor', 'Visitor'),
+    )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    display_name = models.TextField()
+    role = models.CharField(max_length=30, choices=ROLE_CHOICES, default='Visitor')
+    stars = models.PositiveSmallIntegerField()
+    comment = models.TextField(max_length=400)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.display_name} — {self.stars}★'

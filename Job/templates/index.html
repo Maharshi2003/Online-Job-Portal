@@ -1,99 +1,136 @@
 {% load static %}
+{% include 'Navigation.html' %}
 
-{% block body %}
-
-{% include 'Navigation.html'%}
-
-<style>
-    .container{
-    max-width: 90%;
-    margin: auto;
-    overflow: hidden;   /* 🔥 removes extra right line */
-}
-
-    .content{
-        text-align: center;
-        position: absolute; 
-        bottom: 0; 
-        background: black;
-        color: white;
-        width: 100%;
-        padding: 3px;
-    }
-
-    .circle-img{
-        width: 160px;
-        height: 160px;
-        border-radius: 50%;
-        object-fit: cover;
-        display: block;
-        margin: auto;
-    }
-
-    .img-box{
-        position: relative;
-        text-align: center;
-        margin-top: 20px;
-    }
-</style>
-
-<!-- Banner Image
-<div class="container-fluid" style="margin-top:1%">
-    <img src="{% static 'Job/image/photo4.png' %}" 
-         style="height:450px; width:100%" alt="photo">
-</div>-->
-
-<!-- Students Section -->
-<div class="container" style="background-color:black; height:520px; margin-top:2%">
-    <h1 class="text-center text-white">
-        ----------------| Our Placed Students |---------------
-    </h1>
-
-    <div class="row mt-3">
-
-        <div class="col-md-3 img-box">
-            <img src="{% static 'Job/image/photo5.png' %}" class="circle-img">
-            <div class="content"><p>Facebook</p></div>
-        </div>
-
-        <div class="col-md-3 img-box">
-            <img src="{% static 'Job/image/photo11.png' %}" class="circle-img">
-            <div class="content"><p>Amazon</p></div>
-        </div>
-
-        <div class="col-md-3 img-box">
-            <img src="{% static 'Job/image/photo10.png' %}" class="circle-img">
-            <div class="content"><p>Google</p></div>
-        </div>
-
-        <div class="col-md-3 img-box">
-            <img src="{% static 'Job/image/photo8.png' %}" class="circle-img">
-            <div class="content"><p>TCS</p></div>
-        </div>
-
-        <div class="col-md-3 img-box">
-            <img src="{% static 'Job/image/photo13.png' %}" class="circle-img">
-            <div class="content"><p>HCL</p></div>
-        </div>
-
-        <div class="col-md-3 img-box">
-            <img src="{% static 'Job/image/photo7.png' %}" class="circle-img">
-            <div class="content"><p>GPay</p></div>
-        </div>
-
-        <div class="col-md-3 img-box">
-            <img src="{% static 'Job/image/photo15.png' %}" class="circle-img">
-            <div class="content"><p>Paytm</p></div>
-        </div>
-
-        <div class="col-md-3 img-box">
-            <img src="{% static 'Job/image/photo14.png' %}" class="circle-img">
-            <div class="content"><p>PhonePe</p></div>
-        </div>
-        
+<div class="hero-home">
+    <div class="kicker">CareerBridge Job Portal</div>
+    <h1>Find your next career move</h1>
+    <p>Connect with trusted companies, discover openings that match your skills, and apply in minutes.</p>
+    <div class="hero-cta">
+        <a href="{% url 'Latest_Job' %}" class="btn btn-light btn-lg font-weight-bold">Browse Latest Jobs</a>
+        <a href="{% url 'User_login' %}" class="btn btn-outline-light btn-lg font-weight-bold">User Login</a>
     </div>
 </div>
 
-{% include 'Footer.html'%}
+<section class="section-block">
+    <div class="container">
+        <h2>How CareerBridge works</h2>
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="cb-card h-100">
+                    <i class="fa fa-user-plus fa-2x mb-3" style="color:#1b7a3d"></i>
+                    <h4>Create your profile</h4>
+                    <p class="job-meta mb-0">Sign up as a job seeker, company, or recruiter and complete your profile.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="cb-card h-100">
+                    <i class="fa fa-search fa-2x mb-3" style="color:#1b7a3d"></i>
+                    <h4>Discover openings</h4>
+                    <p class="job-meta mb-0">Filter by location, category, salary, and experience to find the right fit.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="cb-card h-100">
+                    <i class="fa fa-paper-plane fa-2x mb-3" style="color:#1b7a3d"></i>
+                    <h4>Apply with confidence</h4>
+                    <p class="job-meta mb-0">Submit your resume, track applications, and save jobs for later.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-{% endblock %}
+<section class="section-block" style="background:#fff;">
+    <div class="container">
+        <h2>What people say</h2>
+        <div class="rating-summary">
+            <div class="rating-score">{% if rating_count %}{{ rating_avg }}{% else %}—{% endif %}</div>
+            <div class="rating-stars mt-2">
+                {% for i in "12345" %}
+                    {% if rating_count and rating_avg >= forloop.counter %}
+                        <i class="fa fa-star"></i>
+                    {% else %}
+                        <i class="fa fa-star-o"></i>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <p class="rating-count">
+                {% if rating_count %}
+                    {{ rating_count }} review{{ rating_count|pluralize }} from the CareerBridge community
+                {% else %}
+                    No reviews yet — be the first to share your experience
+                {% endif %}
+            </p>
+        </div>
+
+        {% if featured_ratings %}
+        <div class="row">
+            {% for r in featured_ratings %}
+            <div class="col-md-4 mb-4">
+                <div class="cb-card rating-card">
+                    <p class="rating-name">{{ r.display_name }}</p>
+                    <span class="rating-role">{{ r.role }}</span>
+                    <div class="rating-stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= r.stars %}<i class="fa fa-star"></i>{% else %}<i class="fa fa-star-o"></i>{% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="rating-comment">{{ r.comment|truncatechars:140 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="text-center mt-2">
+            <a href="{% url 'Ratings' %}" class="btn btn-primary">Rate CareerBridge</a>
+            {% if rating_count %}
+            <a href="{% url 'Ratings' %}" class="btn btn-cb-outline ml-2">See all ratings</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="container">
+        <h2>Our Placed Students</h2>
+        <div class="row">
+            {% for name, img in placed %}
+            {% endfor %}
+            <div class="col-6 col-md-3 mb-4 text-center">
+                <img src="{% static 'Job/image/photo5.png' %}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;" alt="Facebook">
+                <p class="mt-2 font-weight-bold">Facebook</p>
+            </div>
+            <div class="col-6 col-md-3 mb-4 text-center">
+                <img src="{% static 'Job/image/photo11.png' %}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;" alt="Amazon">
+                <p class="mt-2 font-weight-bold">Amazon</p>
+            </div>
+            <div class="col-6 col-md-3 mb-4 text-center">
+                <img src="{% static 'Job/image/photo10.png' %}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;" alt="Google">
+                <p class="mt-2 font-weight-bold">Google</p>
+            </div>
+            <div class="col-6 col-md-3 mb-4 text-center">
+                <img src="{% static 'Job/image/photo8.png' %}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;" alt="TCS">
+                <p class="mt-2 font-weight-bold">TCS</p>
+            </div>
+            <div class="col-6 col-md-3 mb-4 text-center">
+                <img src="{% static 'Job/image/photo13.png' %}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;" alt="HCL">
+                <p class="mt-2 font-weight-bold">HCL</p>
+            </div>
+            <div class="col-6 col-md-3 mb-4 text-center">
+                <img src="{% static 'Job/image/photo7.png' %}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;" alt="GPay">
+                <p class="mt-2 font-weight-bold">GPay</p>
+            </div>
+            <div class="col-6 col-md-3 mb-4 text-center">
+                <img src="{% static 'Job/image/photo15.png' %}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;" alt="Paytm">
+                <p class="mt-2 font-weight-bold">Paytm</p>
+            </div>
+            <div class="col-6 col-md-3 mb-4 text-center">
+                <img src="{% static 'Job/image/photo14.png' %}" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;" alt="PhonePe">
+                <p class="mt-2 font-weight-bold">PhonePe</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include 'Footer.html' %}

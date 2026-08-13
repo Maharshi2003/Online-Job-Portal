@@ -1,524 +1,108 @@
-{% load  static  %}
+{% load static %}
+{% include 'Navigation.html' %}
 
-{% block body%}
+<div class="page-header"><h1>Job Seeker Signup</h1></div>
 
-{%  include 'Navigation.html' %}
-
-<script>
-    function checkpass()
-    {
-        if(document.signup.pwd.value!=document.signup.cpwd.value)
-        {
-            alert('password Does not match');
-            document.signup.cpwd.focus();    <!--to blink the mouse cursur-->
-            return false;
-        }
-        return true;    <!--form will be submit-->
-    } 
-    function togglePassword()
-{
-    var x = document.getElementById("pwd");
-    var y = document.getElementById("eyeicon1");
-
-    if(x.type === "password")
-    {
-        x.type = "text";
-        y.classList.remove("fa-eye");
-        y.classList.add("fa-eye-slash");
-    }
-    else
-    {
-        x.type = "password";
-        y.classList.remove("fa-eye-slash");
-        y.classList.add("fa-eye");
-    }
-}
-
-function toggleConfirmPassword()
-{
-    var x = document.getElementById("cpwd");
-    var y = document.getElementById("eyeicon2");
-
-    if(x.type === "password")
-    {
-        x.type = "text";
-        y.classList.remove("fa-eye");
-        y.classList.add("fa-eye-slash");
-    }
-    else
-    {
-        x.type = "password";
-        y.classList.remove("fa-eye-slash");
-        y.classList.add("fa-eye");
-    }
-}
-function updateCities()
-{
-    var state = document.getElementById("state").value;
-
-    var cityDropdown = document.getElementById("city");
-
-    // Remove old city options
-
-    cityDropdown.innerHTML = '<option value="">Select City</option>';
-
-    // State and Cities
-
-    var cities = {
-
-        "Gujarat": [
-            "Ahmedabad",
-            "Surat",
-            "Vadodara",
-            "Rajkot"
-        ],
-
-        "Maharashtra": [
-            "Mumbai",
-            "Pune",
-            "Nagpur",
-            "Nashik"
-        ],
-
-        "Rajasthan": [
-            "Jaipur",
-            "Udaipur",
-            "Jodhpur"
-        ]
-    };
-
-    // Add new cities
-
-    if(state in cities)
-    {
-        cities[state].forEach(function(city)
-        {
-            var option = document.createElement("option");
-
-            option.value = city;
-
-            option.text = city;
-
-            cityDropdown.appendChild(option);
-        });
-    }
-}
-
-
-function updateCategoryType()
-{
-    var category = document.getElementById("category").value;
-
-    var categoryTypeDropdown =
-        document.getElementById("category_type");
-
-    categoryTypeDropdown.innerHTML =
-        '<option value="">Select Category Type</option>';
-
-    var categoryTypes = {
-
-        "Internship": [
-
-            "Python Intern",
-
-            "Java Intern",
-
-            "Web Development Intern",
-
-            "Frontend Intern",
-
-            "Backend Intern",
-
-            "Full Stack Intern"
-
-        ],
-
-        "Junior Developer": [
-
-            "Python Junior Developer",
-
-            "Java Junior Developer",
-
-            "React Junior Developer",
-
-            "Frontend Developer",
-
-            "Backend Developer"
-
-        ],
-
-        "Senior Developer": [
-
-            "Java Senior Developer",
-
-            "Python Senior Developer",
-
-            "Senior Full Stack Developer",
-
-            "Senior React Developer"
-
-        ],
-
-        "Fresher": [
-
-            "Fresher Python Developer",
-
-            "Fresher Java Developer",
-
-            "Fresher Web Developer"
-
-        ],
-
-        "AI/ML Intern": [
-
-            "Machine Learning Intern",
-
-            "AI Intern",
-
-            "Data Science Intern",
-
-            "Deep Learning Intern"
-
-        ]
-    };
-
-    if(category in categoryTypes)
-    {
-        categoryTypes[category].forEach(function(type)
-        {
-            var option = document.createElement("option");
-
-            option.value = type;
-
-            option.text = type;
-
-            categoryTypeDropdown.appendChild(option);
-        });
-    }
-}
-</script>
-
-<style>
-      .custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
-
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite; 
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-</style>
-
-<!--<marquee style="font-family : 'Monotype' ; 
-    font-size : 25px ; color : black ; background-color : green ; font-weight : 
-    bold ; margin-top : 1%">
-    User Signup    <!--it will show the admin login under the navbar
-</marquee>-->
-
-
-<div class="custom-marquee">
-    <span> User Signup </span>
-</div>
-
-<hr>
-
-<form id="signupForm" 
-    class="container mt-5" 
-    onsubmit="return checkpass();"
-    name="signup" method="POST"  
-    action="/User_signup_api/" 
-    enctype="multipart/form-data">
+<div class="cb-auth-wrap-wide">
+<form class="cb-auth-card" name="signup" method="post" action="/User_signup_api/" enctype="multipart/form-data">
     {% csrf_token %}
-    
-    <div class = "form-row">
-        <div class="form-group col-md-6">
-            <label><i class="fa fa-User mr-2"></i><b>First Name</b></label>
-            <input type="text" class="form-control" name="Fname" placeholder="Enter First Name" required>
+    <h2>Create your candidate account</h2>
+
+    <div class="cb-form-grid">
+        <div>
+            <label>First Name</label>
+            <input type="text" name="Fname" class="form-control" placeholder="Enter your first name" required>
         </div>
-
-        <div class="form-group col-md-6">
-            <label><i class="fa fa-User mr-2"></i><b>Last Name</b></label>
-            <input type="text" class="form-control" name="Lname" placeholder="Enter Last Name" required>
+        <div>
+            <label>Last Name</label>
+            <input type="text" name="Lname" class="form-control" placeholder="Enter your last name" required>
         </div>
-    </div>
-
-    <div class = "form-row">
-        <div class="form-group col-md-12">   <!--12 is the size of the Box-->
-            <label><i class="fa fa-phone-square mr-2"></i><b>Contact No</b></label>
-            <input type="Contact" class="form-control" name="Contact" placeholder="Enter Contact Number">
+        <div>
+            <label>Contact</label>
+            <input type="text" name="Contact" class="form-control" placeholder="Enter your contact number" required>
         </div>
-    </div>
-
-    <div class = "form-row">
-        <div class="form-group col-md-12">
-            <label><i class="fa fa-envelope mr-2"></i><b>Email ID</b></label>
-           <!--<input type="Email" class="form-control" name="Email" placeholder="Enter Email Address" required>-->
-            <div class="input-group">
-
-        <input type="text"
-               class="form-control"
-               name="Email"
-               placeholder="Enter Gmail Username"
-               required>
-
-        <div class="input-group-append">
-            <span class="input-group-text"
-                  style="background-color:#f8f9fa;font-weight:bold;">
-                @gmail.com
-            </span>
+        <div>
+            <label>Email</label>
+            <input type="email" name="Email" class="form-control cb-email-input" placeholder="Enter your email address" required>
         </div>
-
-    </div>
-
-        </div>
-    </div>
-
-    <div class = "form-row">        
-        <div class="form-group col-md-6">
-
-        <label>
-            <i class="fa fa-map mr-2"></i>
-            <b>State</b>
-        </label>
-
-        <select class="form-control"
-                id="state"
-                name="state"
-                onchange="updateCities()"
-                required>
-
-            <option value="">Select State</option>
-            <option value="Gujarat">Gujarat</option>
-            <option value="Maharashtra">Maharashtra</option>
-            <option value="Rajasthan">Rajasthan</option>
-        </select>
-    </div>
-
-    <!-- City Dropdown -->
-    <div class="form-group col-md-6">
-        <label>
-            <i class="fa fa-building mr-2"></i>
-            <b>City</b>
-        </label>
-
-        <select class="form-control"
-                id="city"
-                name="city"
-                required>
-
-            <option value="">Select City</option>
-            
-        </select>
-
-    </div>
-    </div>
-
-    <div class = "form-row">
-
-    <!-- Password -->
-
-    <div class="form-group col-md-6">
-
-        <label>
-            <i class="fa fa-key mr-2"></i>
-            <b>Password</b>
-        </label>
-
-        <div class="input-group">
-
-            <input type="password"
-                   class="form-control"
-                   id="pwd"
-                   name="pwd"
-                   placeholder="Enter Password"
-                   required>
-
-            <div class="input-group-append">
-
-                <span class="input-group-text"
-                      onclick="togglePassword()"
-                      style="cursor:pointer;">
-
-                    <i class="fa fa-eye" id="eyeicon1"></i>
-
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Confirm Password -->
-
-    <div class="form-group col-md-6">
-
-        <label>
-            <i class="fa fa-unlock mr-2"></i>
-            <b>Confirm Password</b>
-        </label>
-
-        <div class="input-group">
-
-            <input type="password"
-                   class="form-control"
-                   id="cpwd"
-                   name="cpwd"
-                   placeholder="Enter Password Again"
-                   required>
-
-            <div class="input-group-append">
-                <span class="input-group-text"
-                      onclick="toggleConfirmPassword()"
-                      style="cursor:pointer;">
-
-                    <i class="fa fa-eye" id="eyeicon2"></i>
-                </span>
+        {% include '_location_selects.html' %}
+        <div>
+            <label>Password</label>
+            <div class="cb-password-field">
+                <input type="password" name="pwd" class="form-control" placeholder="Create a password" required autocomplete="new-password">
+                <button type="button" class="cb-password-toggle" aria-label="Show password" title="Show password">
+                    <i class="fa fa-eye"></i>
+                </button>
             </div>
         </div>
-    </div>
-</div>
-
-    <!-- Category Dropdown -->
-
-<div class="form-row">
-
-    <div class="form-group col-md-6">
-
-        <label>
-            <i class="fa fa-list-alt mr-2"></i>
-            <b>Category</b>
-        </label>
-
-        <select class="form-control"
-                id="category"
-                name="category"
-                onchange="updateCategoryType()"
-                required>
-
-            <option value="">Select Category</option>
-
-            <option value="Internship">Internship</option>
-
-            <option value="Junior Developer">Junior Developer</option>
-
-            <option value="Senior Developer">Senior Developer</option>
-
-            <option value="Fresher">Fresher</option>
-
-            <option value="AI/ML Intern">AI/ML Intern</option>
-
-        </select>
-
-    </div>
-
-    <!-- Category Type Dropdown -->
-
-    <div class="form-group col-md-6">
-
-        <label>
-            <i class="fa fa-tags mr-2"></i>
-            <b>Category Type</b>
-        </label>
-
-        <select class="form-control"
-                id="category_type"
-                name="category_type"
-                required>
-
-            <option value="">Select Category Type</option>
-
-        </select>
-
-    </div>
-
-</div>
-    <!--<div class = "form-row">
-         <div class="form-group col-md-12">
-            <label><i class="fa fa-envelope mr-2"></i><b>Email ID</b></label>
-            <input type="Email" class="form-control" name="Email" placeholder="Enter Email Address" required>
-        </div>
-    </div>
-
-     <div class = "form-row">
-        <div class="form-group col-md-6">
-            <label><i class="fa fa-key mr-2"></i><b>Password</b></label>
-            <input type="Password" class="form-control" name="pwd" placeholder="Enter Password" required>
-        </div>
-
-        <div class="form-group col-md-6">
-            <label><i class="fa fa-unlock mr-2"></i><b>Confirm Password</b></label>
-            <input type="Password" class="form-control" name="cpwd" placeholder="Enter Password Again" required>
-        </div>
-    </div>-->
-
-    <div class = "form-row">
-        <div class="form-group col-md-6">
-            <label><b>Gender</b></label>
-
-           <!-- <div style="border:1px solid lightgrey ; padding:7px border-radius:6px">-->
-
-            <div class="custom-control custom-radio custom-control-inline">
-                <input type="radio" id="customRadioInline1" name="Gender" class="custom-control-input" value="Male" required>
-                <!--Label for the 1 text box-->
-                <label class="custom-control-label" for="customRadioInline1"><i class="fa fa-Male mr-2"></i> Male </label>
+        <div>
+            <label>Confirm Password</label>
+            <div class="cb-password-field">
+                <input type="password" name="cpwd" class="form-control" placeholder="Re-enter your password" required autocomplete="new-password">
+                <button type="button" class="cb-password-toggle" aria-label="Show password" title="Show password">
+                    <i class="fa fa-eye"></i>
+                </button>
             </div>
-
-            <div class="custom-control custom-radio custom-control-inline">
-                <input type="radio" id="customRadioInline2" name="Gender" class="custom-control-input" value="Female"required>
-                <!--Label for the 2 text box-->
-                <label class="custom-control-label" for="customRadioInline2"><i class="fa fa-Female mr-2"></i> Female </label>
-            </div>
-            <!--</div>-->
-        </div>     
-        
-    <div class="form-group col-md-6">
-        <label><i class="fa fa-Image mr-2"></i><b>Image</b></label>
-        <input type="file" class="form-control" name="Image">
+        </div>
+        <div>
+            <label>Category</label>
+            <select name="category" id="seekerCategory" class="form-control" required>
+                <option value="">Select your category</option>
+                <optgroup label="Tech">
+                    <option value="Software Development">Software Development</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Data Science & AI">Data Science & AI</option>
+                    <option value="Cloud & DevOps">Cloud & DevOps</option>
+                    <option value="Cybersecurity & IT Support">Cybersecurity & IT Support</option>
+                    <option value="Fresher">Fresher</option>
+                </optgroup>
+                <optgroup label="Non-Tech">
+                    <option value="Human Resources">Human Resources</option>
+                    <option value="Marketing & Sales">Marketing & Sales</option>
+                    <option value="Finance & Accounting">Finance & Accounting</option>
+                    <option value="Operations & Administration">Operations & Administration</option>
+                    <option value="Design & Content">Design & Content</option>
+                </optgroup>
+            </select>
+        </div>
+        <div>
+            <label>Sub Category</label>
+            <select name="category_type" id="seekerCategoryType" class="form-control" required disabled>
+                <option value="">Select your sub category</option>
+            </select>
+        </div>
+        <div>
+            <label>Gender</label>
+            <select name="Gender" class="form-control" required>
+                <option value="">Select your gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
+        <div>
+            <label>Profile Image</label>
+            <input type="file" name="Image" class="form-control-file" accept="image/*" title="Choose your profile image">
+            <small class="form-text text-muted">Choose a profile photo (optional)</small>
+        </div>
     </div>
 
-    </div>
-
-    <input type="Submit" value="submit" class="btn btn-primary">
-
+    <input type="submit" name="submit" value="submit" class="btn btn-primary mt-4">
+    <p class="mt-3 mb-0">Already registered? <a href="{% url 'User_login' %}" style="color:var(--cb-green);font-weight:700;">Login</a></p>
 </form>
+</div>
 
-<!--{%include 'footer.html'%}-->
+{% include 'Footer.html' %}
+<script src="{% static 'Job/js/category-cascade.js' %}?v=5"></script>
 
 {% if error == "exist" %}
-<script>
-    alert("Email Already Exists");
-</script>
+<script>alert("Email already exists!");</script>
 {% endif %}
-
-{% if error == "no"  %}
+{% if error == "no" %}
 <script>
-    alert("Signup Successfully");
-    window.location.href = "{% url 'User_login' %}";
+    alert("Registration successful!");
+    window.location = "{% url 'User_login' %}";
 </script>
 {% endif %}
 {% if error == "yes" %}
-<script>
-    alert("Something Went Wrong, Try Again...");
-</script>
+<script>alert("Something went wrong. Please try again.");</script>
 {% endif %}
-       
-{% endblock %}

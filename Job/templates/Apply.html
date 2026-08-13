@@ -1,90 +1,39 @@
 {% load static %}
+{% include 'User_navigation.html' %}
 
- {% block body %}
+<div class="page-header"><h1>Apply for Job</h1></div>
 
- {% include 'User_navigation.html' %}
+<div class="cb-auth-wrap">
+<form class="cb-auth-card" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h2>Upload your resume</h2>
+    <p class="job-meta mb-3">Submit a resume (PDF/DOC) to complete your application.</p>
 
-    <style>
-        tr { text-align: center; }
+    <label for="Resume"><i class="fa fa-file-text-o mr-1"></i> Resume</label>
+    <input type="file" id="Resume" name="Resume" class="form-control-file" accept=".pdf,.doc,.docx" required>
 
-        .custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
-
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite; 
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-    </style>
-
-<!--<marquee style="
-        font-family: 'Monotype';
-        font-size: 25px;
-        color: black;
-        background-color: green;
-        font-weight: bold;
-        margin-top: 1%;">
-    Apply For Job
-    </marquee>-->
-
-<div class="custom-marquee">
-    <span>Apply For Job</span>
+    <button type="submit" class="btn btn-primary mt-4">Submit Application</button>
+    <p class="mt-3 mb-0"><a href="{% url 'User_latestjob' %}" style="color:var(--cb-green);font-weight:600;">Back to jobs</a></p>
+</form>
 </div>
 
+{% include 'Footer.html' %}
 
-    <hr>
-
-    <div class="container shadow-lg py-2 mb-2">
-       <div >
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-row">
-                    <label class="font-weight-bold">Upload Resume<label>
-                        <input type="file" class="form-control" name="Resume" required pdf only>        
-                </div>
-                <input type="Submit" vlaue="submit" class="btn btn-success mt-3 ">
-            </form>
-       </div>
-
-    </div>
-
-{% if error == "Close"  %}
+{% if error == "Close" %}
 <script>
-    alert("Application Forms Are Closed, last date");
-    window.location.href ="{% url 'User_latestjob' %}";
+    alert("Applications are closed for this job.");
+    window.location = "{% url 'User_latestjob' %}";
 </script>
 {% endif %}
-{% if error == "Not Open"  %}
+{% if error == "Not Open" %}
 <script>
-    alert("Application Forms Are Not Open");
-    window.location.href = "{% url 'User_latestjob' %}";
+    alert("Applications are not open yet for this job.");
+    window.location = "{% url 'User_latestjob' %}";
 </script>
 {% endif %}
-{% if error == "Done"  %}
+{% if error == "Done" %}
 <script>
-    alert(" Job Applcation Submitted Successfully");
-    window.location.href = "{% url 'User_latestjob' %}";
+    alert("Application submitted successfully!");
+    window.location = "{% url 'User_latestjob' %}";
 </script>
 {% endif %}
-
-{% include 'footer.html'%}
-
-{% endblock %}

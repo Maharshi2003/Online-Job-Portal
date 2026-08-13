@@ -1,202 +1,57 @@
 {% load static %}
-{% block body %}
-
 {% if recruiter %}
     {% include 'Recruiter_navigation.html' %}
 {% elif company %}
     {% include 'Company_navigation.html' %}
 {% endif %}
 
-<script>
-function updateCategoryType()
-{
-    var category = document.getElementById("category").value;
-    var categoryTypeDropdown = document.getElementById("category_type");
+<div class="page-header"><h1>Post a Job</h1></div>
 
-    categoryTypeDropdown.innerHTML = '<option value="">Select Category Type</option>';
-    categoryTypeDropdown.disabled = true;
-
-    var categoryTypes = {
-        "Internship": [
-            "Python Intern",
-            "Java Intern",
-            "Web Development Intern",
-            "Frontend Intern",
-            "Backend Intern",
-            "Full Stack Intern"
-        ],
-        "Junior Developer": [
-            "Python Junior Developer",
-            "Java Junior Developer",
-            "React Junior Developer",
-            "Frontend Developer",
-            "Backend Developer"
-        ],
-        "Senior Developer": [
-            "Java Senior Developer",
-            "Python Senior Developer",
-            "Senior Full Stack Developer",
-            "Senior React Developer"
-        ],
-        "Fresher": [
-            "Fresher Python Developer",
-            "Fresher Java Developer",
-            "Fresher Web Developer"
-        ],
-        "AI/ML Intern": [
-            "Machine Learning Intern",
-            "AI Intern",
-            "Data Science Intern",
-            "Deep Learning Intern"
-        ]
-    };
-
-    if(category in categoryTypes)
-    {
-        categoryTypeDropdown.disabled = false;
-
-        categoryTypes[category].forEach(function(type)
-        {
-            var option = document.createElement("option");
-            option.value = type;
-            option.text = type;
-            categoryTypeDropdown.appendChild(option);
-        });
-    }
-}
-</script>
-
-<style>
-.custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
-
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite;
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-</style>
-
-<div class="custom-marquee">
-    <span>Add Job Details</span>
-</div>
-
-<hr>
-
-<form class="container mt-5" method="POST" enctype="multipart/form-data">
+<div class="cb-auth-wrap-wide">
+<form class="cb-auth-card" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+    <h2>Job details</h2>
 
-    <!-- Job Title -->
-
-    <div class="form-row">
-        <div class="form-group col-md-12">
-            <label>
-                <i class="fa fa-briefcase mr-2"></i>
-                <b>Job Title</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="job_title"
-                   placeholder="Enter Job Title"
-                   required>
+    <div class="cb-form-grid">
+        <div class="full">
+            <label>Job Title</label>
+            <input type="text" class="form-control" name="job_title" placeholder="Enter job title" required>
         </div>
-    </div>
-
-    <!-- Category and Category Type -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-            <label>
-                <i class="fa fa-list mr-2"></i>
-                <b>Category</b>
-            </label>
-
-            <select class="form-control"
-                    id="category"
-                    name="category"
-                    onchange="updateCategoryType()"
-                    required>
-
+        <div>
+            <label>Category</label>
+            <select class="form-control" id="category" name="category" required>
                 <option value="">Select Category</option>
-
-                <option value="Internship">Internship</option>
-                <option value="Junior Developer">Junior Developer</option>
-                <option value="Senior Developer">Senior Developer</option>
-                <option value="Fresher">Fresher</option>
-                <option value="AI/ML Intern">AI/ML Intern</option>
-                <option value="AI/ML Intern">Business Development</option>
-
+                <optgroup label="Tech">
+                    <option value="Software Development">Software Development</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Data Science & AI">Data Science & AI</option>
+                    <option value="Cloud & DevOps">Cloud & DevOps</option>
+                    <option value="Cybersecurity & IT Support">Cybersecurity & IT Support</option>
+                    <option value="Fresher">Fresher</option>
+                </optgroup>
+                <optgroup label="Non-Tech">
+                    <option value="Human Resources">Human Resources</option>
+                    <option value="Marketing & Sales">Marketing & Sales</option>
+                    <option value="Finance & Accounting">Finance & Accounting</option>
+                    <option value="Operations & Administration">Operations & Administration</option>
+                    <option value="Design & Content">Design & Content</option>
+                </optgroup>
             </select>
         </div>
-
-        <div class="form-group col-md-6">
-            <label>
-                <i class="fa fa-code mr-2"></i>
-                <b>Category Type</b>
-            </label>
-
-            <select class="form-control"
-                    id="category_type"
-                    name="category_type"
-                    disabled
-                    required>
-
-                <option value="">Select Category Type</option>
-
+        <div>
+            <label>Sub Category</label>
+            <select class="form-control" id="category_type" name="category_type" disabled required>
+                <option value="">Select Sub Category</option>
             </select>
         </div>
-    </div>
-
-    <div class="form-row">
-        <div class="form-group col-md-12">
-            <label>
-                <i class="fa fa-image mr-2"></i>
-                <b>Company Logo (Optional)</b>
-            </label>
-
-             <input type="file"
-                class="form-control"
-                name="clogo"
-                accept="image/*">
+        <div class="full">
+            <label>Company Logo (optional)</label>
+            <input type="file" class="form-control-file" name="clogo" accept="image/*">
         </div>
-    </div>
-
-    <!-- Experience and Location -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-            <label>
-                <i class="fa fa-clock-o mr-2"></i>
-                <b>Experience</b>
-            </label>
-
-            <select class="form-control"
-                    name="experience"
-                    required>
-
+        <div>
+            <label>Experience</label>
+            <select class="form-control" name="experience" required>
                 <option value="">Select Experience</option>
-
                 <option>0-1 Year</option>
                 <option>1-1.5 Years</option>
                 <option>1.5-2 Years</option>
@@ -211,167 +66,66 @@ function updateCategoryType()
                 <option>10-12 Years</option>
                 <option>12-15 Years</option>
                 <option>15-20 Years</option>
-
             </select>
         </div>
-
-        <div class="form-group col-md-6">
-            <label>
-                <i class="fa fa-map-marker mr-2"></i>
-                <b>Location</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="location"
-                   placeholder="Enter Job Location"
-                   required>
+        <div>
+            <label>Location</label>
+            <select class="form-control" name="location" required>
+                <option value="">Select location type</option>
+                <option value="Remote">Remote</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="On-Site">On-Site</option>
+            </select>
         </div>
-
+        <div>
+            <label>Minimum Salary</label>
+            <input type="number" class="form-control" name="min_salary" required>
+        </div>
+        <div>
+            <label>Maximum Salary</label>
+            <input type="number" class="form-control" name="max_salary" required>
+        </div>
+        <div>
+            <label>Start Date</label>
+            <input type="date" class="form-control" name="start_date" required>
+        </div>
+        <div>
+            <label>End Date</label>
+            <input type="date" class="form-control" name="end_date" required>
+        </div>
+        <div class="full">
+            <label>Skills</label>
+            <input type="text" class="form-control" name="skills" placeholder="Python, Django, MySQL" required>
+        </div>
+        <div class="full">
+            <label>Job Description</label>
+            <textarea class="form-control" name="job_description" rows="5" required></textarea>
+        </div>
     </div>
 
-    <!-- Salary -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-            <label>
-                <i class="fa fa-money mr-2"></i>
-                <b>Minimum Salary</b>
-            </label>
-
-            <input type="number"
-                   class="form-control"
-                   name="min_salary"
-                   placeholder="Minimum Salary"
-                   required>
-        </div>
-
-        <div class="form-group col-md-6">
-            <label>
-                <i class="fa fa-money mr-2"></i>
-                <b>Maximum Salary</b>
-            </label>
-
-            <input type="number"
-                   class="form-control"
-                   name="max_salary"
-                   placeholder="Maximum Salary"
-                   required>
-        </div>
-
-    </div>
-
-    <!-- Dates -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-            <label>
-                <i class="fa fa-calendar mr-2"></i>
-                <b>Start Date</b>
-            </label>
-
-            <input type="date"
-                   class="form-control"
-                   name="start_date"
-                   required>
-        </div>
-
-        <div class="form-group col-md-6">
-            <label>
-                <i class="fa fa-calendar mr-2"></i>
-                <b>End Date</b>
-            </label>
-
-            <input type="date"
-                   class="form-control"
-                   name="end_date"
-                   required>
-        </div>
-
-    </div>
-
-    <!-- Skills -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-            <label>
-                <i class="fa fa-cogs mr-2"></i>
-                <b>Skills</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="skills"
-                   placeholder="Python, Django, MySQL, HTML, CSS"
-                   required>
-        </div>
-
-    </div>
-
-    <!-- Description -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-            <label>
-                <i class="fa fa-file-text mr-2"></i>
-                <b>Job Description</b>
-            </label>
-
-            <textarea class="form-control"
-                      name="job_description"
-                      rows="5"
-                      placeholder="Enter Job Description"
-                      required></textarea>
-        </div>
-
-    </div>
-
-    <input type="submit"
-           value="Post Job"
-           class="btn btn-primary my-3">
-
+    <input type="submit" value="Post Job" class="btn btn-primary mt-4">
 </form>
+</div>
+
+{% include 'Footer.html' %}
+<script src="{% static 'Job/js/category-cascade.js' %}?v=5"></script>
 
 {% if error == "Close" %}
-<script>
-    alert("Application Forms Are Closed, last date");
-    window.location.href = "{% url 'Job_List' %}";
-</script>
+<script>alert("Application forms are closed."); window.location.href = "{% url 'Job_List' %}";</script>
 {% endif %}
-
 {% if error == "Not Open" %}
-<script>
-    alert("Application Forms Are Not Open");
-    window.location.href = "{% url 'Job_List' %}";
-</script>
+<script>alert("Application forms are not open."); window.location.href = "{% url 'Job_List' %}";</script>
 {% endif %}
-
 {% if error == "Done" %}
 <script>
-    alert("Job Added Successfully");
-    {% if recruiter %}
-        window.location.href = "{% url 'Job_List' %}";
-    {% elif company %}
-        window.location.href = "{% url 'Company_home' %}";
-    {% endif %}
+    alert("Job added successfully");
+    {% if recruiter %}window.location.href = "{% url 'Job_List' %}";
+    {% elif company %}window.location.href = "{% url 'Company_home' %}";{% endif %}
 </script>
 {% endif %}
-
 {% if error == "company_posted" %}
-<script>
-    alert("{{ message|escapejs }}");
-    window.location.href = "{% url 'Recruiter_home' %}";
-</script>
+<script>alert("{{ message|escapejs }}"); window.location.href = "{% url 'Recruiter_home' %}";</script>
 {% endif %}
-
 {% if error == "recruiter_posted" %}
-<script>
-    alert("{{ message|escapejs }}");
-    window.location.href = "{% url 'Company_home' %}";
-</script>
+<script>alert("{{ message|escapejs }}"); window.location.href = "{% url 'Company_home' %}";</script>
 {% endif %}
-{% endblock %}

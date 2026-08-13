@@ -1,512 +1,89 @@
 {% load static %}
+{% include 'Navigation.html' %}
 
-{% block body %}
+<div class="page-header"><h1>Recruiter Signup</h1></div>
 
-{% include 'navigation.html' %}
-
-<script>
-
-function checkpass()
-{
-    if(document.signup.pwd.value != document.signup.cpwd.value)
-    {
-        alert('Password Does not Match');
-        document.signup.cpwd.focus();
-        return false;
-    }
-
-    var gender = document.signup.Gender;
-
-    var selected = false;
-
-    for(var i = 0; i < gender.length; i++)
-    {
-        if(gender[i].checked)
-        {
-            selected = true;
-            break;
-        }
-    }
-
-    if(!selected)
-    {
-        alert('Please Select Gender');
-        return false;
-    }
-
-    return true;
-}
- function togglePassword()
-{
-    var x = document.getElementById("pwd");
-    var y = document.getElementById("eyeicon1");
-
-    if(x.type === "password")
-    {
-        x.type = "text";
-        y.classList.remove("fa-eye");
-        y.classList.add("fa-eye-slash");
-    }
-    else
-    {
-        x.type = "password";
-        y.classList.remove("fa-eye-slash");
-        y.classList.add("fa-eye");
-    }
-}
-
-function toggleConfirmPassword()
-{
-    var x = document.getElementById("cpwd");
-    var y = document.getElementById("eyeicon2");
-
-    if(x.type === "password")
-    {
-        x.type = "text";
-        y.classList.remove("fa-eye");
-        y.classList.add("fa-eye-slash");
-    }
-    else
-    {
-        x.type = "password";
-        y.classList.remove("fa-eye-slash");
-        y.classList.add("fa-eye");
-    }
-}
-
-/* STATE -> CITY */
-
-function updateCities()
-{
-    var state = document.getElementById("state").value;
-
-    var cityDropdown = document.getElementById("city");
-
-    cityDropdown.innerHTML = '<option value="">Select City</option>';
-
-    var cities = {
-
-        "Gujarat": [
-            "Ahmedabad",
-            "Surat",
-            "Vadodara",
-            "Rajkot"
-        ],
-
-        "Maharashtra": [
-            "Mumbai",
-            "Pune",
-            "Nagpur"
-        ],
-
-        "Rajasthan": [
-            "Jaipur",
-            "Udaipur",
-            "Jodhpur"
-        ]
-    };
-
-    if(state in cities)
-    {
-        cities[state].forEach(function(city)
-        {
-            var option = document.createElement("option");
-
-            option.value = city;
-
-            option.text = city;
-
-            cityDropdown.appendChild(option);
-        });
-    }
-}
-
-</script>
-
-<style>
-
-.custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
-
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite;
-}
-
-@keyframes marquee {
-
-    0% {
-        transform: translateX(0%);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-</style>
-
-<div class="custom-marquee">
-    <span> Recruiter Signup </span>
-</div>
-
-<hr>
-
-<form class="container mt-5"
-      onsubmit="return checkpass();"
-      name="signup"
-      method="POST"
-      action="{% url 'Recruiter_Signup_api' %}"
-      enctype="multipart/form-data">
-
+<div class="cb-auth-wrap-wide">
+<form class="cb-auth-card" name="signup" method="post" action="{% url 'Recruiter_Signup_api' %}" enctype="multipart/form-data">
     {% csrf_token %}
+    <h2>Create your recruiter account</h2>
 
-    <!-- First Name Last Name -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-user mr-2"></i>
-                <b>First Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="first_name"
-                   placeholder="Enter First Name"
-                   required>
-
+    <div class="cb-form-grid">
+        <div>
+            <label>First Name</label>
+            <input type="text" name="first_name" class="form-control" placeholder="Enter your first name" required>
         </div>
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-user mr-2"></i>
-                <b>Last Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="last_name"
-                   placeholder="Enter Last Name"
-                   required>
-
+        <div>
+            <label>Last Name</label>
+            <input type="text" name="last_name" class="form-control" placeholder="Enter your last name" required>
         </div>
-
-    </div>
-
-    <!-- Contact and Company -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-phone-square mr-2"></i>
-                <b>Contact Number</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="contact_no"
-                   placeholder="Enter Contact Number"
-                   required>
-
+        <div>
+            <label>Contact No</label>
+            <input type="text" name="contact_no" class="form-control" placeholder="Enter your contact number" required>
         </div>
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-building mr-2"></i>
-                <b>Company Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="cname"
-                   placeholder="Enter Company Name"
-                   required>
-
+        <div>
+            <label>Company Name</label>
+            <input type="text" name="cname" class="form-control" placeholder="Enter company name" required>
         </div>
-
-    </div>
-
-    <!-- Email -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label><i class="fa fa-envelope mr-2"></i> <b>Email ID</b></label>
-            <!--<input type="email" class="form-control" name="email" placeholder="Enter Email Address" required>-->
-
-    <div class="input-group">
-
-        <input type="text"
-               class="form-control"
-               name="Email"
-               placeholder="Enter Gmail Address"
-               required>
-
-        <!--<div class="input-group-append">
-            <span class="input-group-text"
-                  style="background-color:#f8f9fa;font-weight:bold;">
-                @gmail.com
-            </span>
-        </div>-->
-
-    </div>
-
+        <div>
+            <label>Email</label>
+            <input type="email" name="Email" class="form-control cb-email-input" placeholder="Enter your email address" required>
         </div>
-
-    </div>
-
-    <!-- State City -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-map mr-2"></i>
-                <b>State</b>
-            </label>
-
-            <select class="form-control"
-                    id="state"
-                    name="state"
-                    onchange="updateCities()"
-                    required>
-
-                <option value="">Select State</option>
-
-                <option value="Gujarat">Gujarat</option>
-
-                <option value="Maharashtra">Maharashtra</option>
-
-                <option value="Rajasthan">Rajasthan</option>
-
+        <div>
+            <label>Gender</label>
+            <select name="Gender" class="form-control" required>
+                <option value="">Select your gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
             </select>
-
         </div>
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-building-o mr-2"></i>
-                <b>City</b>
-            </label>
-
-            <select class="form-control"
-                    id="city"
-                    name="city"
-                    required>
-
-                <option value="">Select City</option>
-
-            </select>
-
-        </div>
-
-    </div>
-
-<div class="form-row">
-
-    <!-- Password -->
-    <div class="form-group col-md-6">
-        <label>
-            <i class="fa fa-key mr-2"></i>
-            <b>Password</b>
-        </label>
-        <div class="input-group">
-
-            <input type="password"
-                   class="form-control"
-                   id="pwd"
-                   name="pwd"
-                   placeholder="Enter Password"
-                   required>
-
-            <div class="input-group-append">
-                <span class="input-group-text"
-                      onclick="togglePassword()"
-                      style="cursor:pointer;">
-
-                    <i class="fa fa-eye" id="eyeicon1"></i>
-
-                </span>
+        {% include '_location_selects.html' %}
+        <div>
+            <label>Password</label>
+            <div class="cb-password-field">
+                <input type="password" name="pwd" class="form-control" placeholder="Create a password" required autocomplete="new-password">
+                <button type="button" class="cb-password-toggle" aria-label="Show password" title="Show password">
+                    <i class="fa fa-eye"></i>
+                </button>
             </div>
         </div>
-    </div>
-
-    <!-- Confirm Password -->
-
-    <div class="form-group col-md-6">
-
-        <label>
-            <i class="fa fa-unlock mr-2"></i>
-            <b>Confirm Password</b>
-        </label>
-
-        <div class="input-group">
-
-            <input type="password"
-                   class="form-control"
-                   id="cpwd"
-                   name="cpwd"
-                   placeholder="Enter Password Again"
-                   required>
-
-            <div class="input-group-append">
-                <span class="input-group-text"
-                      onclick="toggleConfirmPassword()"
-                      style="cursor:pointer;">
-                        <i class="fa fa-eye" id="eyeicon2"></i>
-                </span>
+        <div>
+            <label>Confirm Password</label>
+            <div class="cb-password-field">
+                <input type="password" name="cpwd" class="form-control" placeholder="Re-enter your password" required autocomplete="new-password">
+                <button type="button" class="cb-password-toggle" aria-label="Show password" title="Show password">
+                    <i class="fa fa-eye"></i>
+                </button>
             </div>
+        </div>
+        <div>
+            <label>Profile Image</label>
+            <input type="file" name="recruiter_image" class="form-control-file" accept="image/*" title="Choose your profile image">
+            <small class="form-text text-muted">Choose a profile photo (optional)</small>
+        </div>
+        <div>
+            <label>Company Logo</label>
+            <input type="file" name="clogo" class="form-control-file" accept="image/*" title="Choose company logo">
+            <small class="form-text text-muted">Choose a company logo (optional)</small>
         </div>
     </div>
 
+    <input type="submit" value="Submit" class="btn btn-primary mt-4">
+    <p class="mt-3 mb-0">Already registered? <a href="{% url 'Recruiter_login' %}" style="color:var(--cb-green);font-weight:700;">Login</a></p>
+</form>
 </div>
 
-    <!-- Gender and Recruiter Image -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <b>Gender</b>
-            </label>
-
-            <br>
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="male"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Male">
-
-                <label class="custom-control-label"
-                       for="male">
-
-                    <i class="fa fa-male mr-2"></i>
-                    Male
-
-                </label>
-
-            </div>
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="female"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Female">
-
-                <label class="custom-control-label"
-                       for="female">
-
-                    <i class="fa fa-female mr-2"></i>
-                    Female
-
-                </label>
-
-            </div>
-
-        </div>
-
-        <!-- Recruiter Image -->
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-image mr-2"></i>
-                <b>Recruiter Image</b>
-            </label>
-
-            <input type="file"
-                   class="form-control"
-                   name="recruiter_image"
-                   required>
-
-        </div>
-
-    </div>
-
-    <!-- Company Logo -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-picture-o mr-2"></i>
-                <b>Company Logo</b>
-            </label>
-
-            <input type="file"
-                   class="form-control"
-                   name="clogo"
-                   required>
-
-        </div>
-
-    </div>
-
-    <!-- Submit Button -->
-
-    <input type="submit"
-           value="Submit"
-           class="btn btn-primary">
-
-</form>
-
-{% if error == "no" %}
-
-<script>
-
-    alert("Recruiter Signup Successfully");
-
-    window.location.href = "{% url 'Recruiter_login' %}";
-
-</script>
-
-{% endif %}
-
-{% if error == "yes" %}
-
-<script>
-
-    alert("Something Went Wrong, Try Again...");
-
-</script>
-
-{% endif %}
+{% include 'Footer.html' %}
 
 {% if error == "exist" %}
-
-<script>
-
-    alert("Email already exists!");
-
-</script>
-
+<script>alert("Email already exists!");</script>
 {% endif %}
-
-{% endblock %}
+{% if error == "no" %}
+<script>
+    alert("Registration successful! Await company approval.");
+    window.location = "{% url 'Recruiter_login' %}";
+</script>
+{% endif %}
+{% if error == "yes" %}
+<script>alert("Something went wrong. Please try again.");</script>
+{% endif %}

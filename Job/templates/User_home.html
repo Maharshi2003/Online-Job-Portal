@@ -1,479 +1,110 @@
-{% load  static  %}
+{% load static %}
+{% include 'User_navigation.html' %}
 
-{% block body%}
+<div class="page-header"><h1>My Profile</h1></div>
 
-{%  include 'User_navigation.html' %}
-
-<style>
-.custom-marquee {
-    width: 100%;
-    overflow: hidden;
-    background-color: green;
-    margin-top: 1%;
-}
-
-.custom-marquee span {
-    display: inline-block;
-    white-space: nowrap;
-    font-family: 'Monotype';
-    font-size: 25px;
-    color: black;
-    font-weight: bold;
-    padding-left: 100%;
-    animation: marquee 12s linear infinite; 
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-</style>
-
-<div class="custom-marquee">
-    <span> Profile </span>
+<div class="cb-page">
+{% if stats %}
+<div class="stats-strip">
+    <div class="stat-card"><div class="stat-label">Applications</div><div class="stat-value">{{ stats.applications }}</div></div>
+    <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value">{{ stats.pending }}</div></div>
+    <div class="stat-card"><div class="stat-label">Accepted</div><div class="stat-value">{{ stats.accepted }}</div></div>
+    <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value">{{ stats.rejected }}</div></div>
+    <div class="stat-card"><div class="stat-label">Saved Jobs</div><div class="stat-value">{{ stats.saved }}</div></div>
 </div>
+{% endif %}
 
-<hr>
-
-<div class="container">
-    <div class="row">
-       <div class="col-sm-12">
-
-<form class="mt-5"
-      name="signup"
-      method="POST"
-      enctype="multipart/form-data">
-
+<form class="cb-auth-card" name="signup" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    
-    <!-- First Name and Last Name -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-user mr-2"></i>
-                <b>First Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="Fname"
-                   value="{{Job_Seeker.User.first_name}}"
-                   readonly
-                   required>
-
-        </div>
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-user mr-2"></i>
-                <b>Last Name</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="Lname"
-                   value="{{Job_Seeker.User.last_name}}"
-                   readonly
-                   required>
-
-        </div>
-
-    </div>
-
-    <!-- Contact -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-phone-square mr-2"></i>
-                <b>Contact No</b>
-            </label>
-
-            <input type="text"
-                   class="form-control"
-                   name="Contact"
-                   value="{{Job_Seeker.mobile}}"
-                   readonly>
-
-        </div>
-
-    </div>
-
-    <!-- Email -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-envelope mr-2"></i>
-                <b>Email ID</b>
-            </label>
-
-            <input type="email"
-                   class="form-control"
-                   name="Email"
-                   value="{{Job_Seeker.User.username}}"
-                   readonly
-                   required>
-
-        </div>
-
-    </div>
-
-    <!-- Category -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-list mr-2"></i>
-                <b>Category</b>
-            </label>
-
-            <select class="form-control"
-                    name="category">
-
-                <option value="">Select Category</option>
-
-                <option value="Internship"
-                {% if Job_Seeker.Category.Category == "Internship" %}selected{% endif %}>
-                Internship
-                </option>
-
-                <option value="Junior Developer"
-                {% if Job_Seeker.Category.Category == "Junior Developer" %}selected{% endif %}>
-                Junior Developer
-                </option>
-
-                <option value="Senior Developer"
-                {% if Job_Seeker.Category.Category == "Senior Developer" %}selected{% endif %}>
-                Senior Developer
-                </option>
-
-                <option value="Fresher"
-                {% if Job_Seeker.Category.Category == "Fresher" %}selected{% endif %}>
-                Fresher
-                </option>
-
-                <option value="AI/ML Intern"
-                {% if Job_Seeker.Category.Category == "AI/ML Intern" %}selected{% endif %}>
-                AI/ML Intern
-                </option>
-
-            </select>
-
-        </div>
-
-        <!-- Category Type -->
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <i class="fa fa-briefcase mr-2"></i>
-                <b>Category Type</b>
-            </label>
-
-            <select class="form-control"
-                    name="category_type">
-
-                <option value="">Select Category Type</option>
-
-                <option value="Python Intern"
-                {% if Job_Seeker.category_type == "Python Intern" %}selected{% endif %}>
-                Python Intern
-                </option>
-
-                <option value="Java Intern"
-                {% if Job_Seeker.category_type == "Java Intern" %}selected{% endif %}>
-                Java Intern
-                </option>
-
-                <option value="Web Development Intern"
-                {% if Job_Seeker.category_type == "Web Development Intern" %}selected{% endif %}>
-                Web Development Intern
-                </option>
-
-                <option value="Frontend Intern"
-                {% if Job_Seeker.category_type == "Frontend Intern" %}selected{% endif %}>
-                Frontend Intern
-                </option>
-
-                <option value="Backend Intern"
-                {% if Job_Seeker.category_type == "Backend Intern" %}selected{% endif %}>
-                Backend Intern
-                </option>
-
-                <option value="Full Stack Intern"
-                {% if Job_Seeker.category_type == "Full Stack Intern" %}selected{% endif %}>
-                Full Stack Intern
-                </option>
-
-                <option value="Python Junior Developer"
-                {% if Job_Seeker.category_type == "Python Junior Developer" %}selected{% endif %}>
-                Python Junior Developer
-                </option>
-
-                <option value="Java Junior Developer"
-                {% if Job_Seeker.category_type == "Java Junior Developer" %}selected{% endif %}>
-                Java Junior Developer
-                </option>
-
-                <option value="React Junior Developer"
-                {% if Job_Seeker.category_type == "React Junior Developer" %}selected{% endif %}>
-                React Junior Developer
-                </option>
-
-                <option value="Frontend Developer"
-                {% if Job_Seeker.category_type == "Frontend Developer" %}selected{% endif %}>
-                Frontend Developer
-                </option>
-
-                <option value="Backend Developer"
-                {% if Job_Seeker.category_type == "Backend Developer" %}selected{% endif %}>
-                Backend Developer
-                </option>
-
-                <option value="Java Senior Developer"
-                {% if Job_Seeker.category_type == "Java Senior Developer" %}selected{% endif %}>
-                Java Senior Developer
-                </option>
-
-                <option value="Python Senior Developer"
-                {% if Job_Seeker.category_type == "Python Senior Developer" %}selected{% endif %}>
-                Python Senior Developer
-                </option>
-
-                <option value="Senior Full Stack Developer"
-                {% if Job_Seeker.category_type == "Senior Full Stack Developer" %}selected{% endif %}>
-                Senior Full Stack Developer
-                </option>
-
-                <option value="Senior React Developer"
-                {% if Job_Seeker.category_type == "Senior React Developer" %}selected{% endif %}>
-                Senior React Developer
-                </option>
-
-                <option value="Fresher Python Developer"
-                {% if Job_Seeker.category_type == "Fresher Python Developer" %}selected{% endif %}>
-                Fresher Python Developer
-                </option>
-
-                <option value="Fresher Java Developer"
-                {% if Job_Seeker.category_type == "Fresher Java Developer" %}selected{% endif %}>
-                Fresher Java Developer
-                </option>
-
-                <option value="Fresher Web Developer"
-                {% if Job_Seeker.category_type == "Fresher Web Developer" %}selected{% endif %}>
-                Fresher Web Developer
-                </option>
-
-                <option value="Machine Learning Intern"
-                {% if Job_Seeker.category_type == "Machine Learning Intern" %}selected{% endif %}>
-                Machine Learning Intern
-                </option>
-
-                <option value="AI Intern"
-                {% if Job_Seeker.category_type == "AI Intern" %}selected{% endif %}>
-                AI Intern
-                </option>
-
-                <option value="Data Science Intern"
-                {% if Job_Seeker.category_type == "Data Science Intern" %}selected{% endif %}>
-                Data Science Intern
-                </option>
-
-                <option value="Deep Learning Intern"
-                {% if Job_Seeker.category_type == "Deep Learning Intern" %}selected{% endif %}>
-                Deep Learning Intern
-                </option>
-
-            </select>
-
-        </div>
-
-    </div>
-
-    <!-- Change Profile Image -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-
-            <label>
-                <i class="fa fa-image mr-2"></i>
-                <b>Change Profile Image</b>
-            </label>
-
-            <input type="file"
-                   class="form-control"
-                   name="Image"
-                   accept="image/*">
-
-        </div>
-
-    </div>
-
-    <!-- Gender and Image -->
-
-    <div class="form-row">
-
-        <div class="form-group col-md-6">
-
-            <label>
-                <b>Gender</b>
-            </label>
-
-            {% if Job_Seeker.gender == "Male" %}
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="customRadioInline1"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Male"
-                       checked>
-
-                <label class="custom-control-label"
-                       for="customRadioInline1">
-
-                    <i class="fa fa-male mr-2"></i>
-                    Male
-
-                </label>
-
+    <h2>Profile details</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="cb-form-grid">
+                <div>
+                    <label>First Name</label>
+                    <input type="text" class="form-control" name="Fname" value="{{ Job_Seeker.User.first_name }}" readonly required>
+                </div>
+                <div>
+                    <label>Last Name</label>
+                    <input type="text" class="form-control" name="Lname" value="{{ Job_Seeker.User.last_name }}" readonly required>
+                </div>
+                <div>
+                    <label>Contact</label>
+                    <input type="text" class="form-control" name="Contact" value="{{ Job_Seeker.mobile }}" readonly>
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input type="email" class="form-control" name="Email" value="{{ Job_Seeker.User.username }}" readonly required>
+                </div>
+                <div>
+                    <label>Category</label>
+                    <select class="form-control" name="category">
+                        <option value="">Select Category</option>
+                        <option value="Internship" {% if Job_Seeker.Category.Category == "Internship" %}selected{% endif %}>Internship</option>
+                        <option value="Junior Developer" {% if Job_Seeker.Category.Category == "Junior Developer" %}selected{% endif %}>Junior Developer</option>
+                        <option value="Senior Developer" {% if Job_Seeker.Category.Category == "Senior Developer" %}selected{% endif %}>Senior Developer</option>
+                        <option value="Fresher" {% if Job_Seeker.Category.Category == "Fresher" %}selected{% endif %}>Fresher</option>
+                        <option value="AI/ML Intern" {% if Job_Seeker.Category.Category == "AI/ML Intern" %}selected{% endif %}>AI/ML Intern</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Sub Category</label>
+                    <select class="form-control" name="category_type">
+                        <option value="">Select Sub Category</option>
+                        <option value="{{ Job_Seeker.category_type }}" selected>{{ Job_Seeker.category_type }}</option>
+                        <option value="Python Intern">Python Intern</option>
+                        <option value="Java Intern">Java Intern</option>
+                        <option value="Web Development Intern">Web Development Intern</option>
+                        <option value="Frontend Intern">Frontend Intern</option>
+                        <option value="Backend Intern">Backend Intern</option>
+                        <option value="Full Stack Intern">Full Stack Intern</option>
+                        <option value="Python Junior Developer">Python Junior Developer</option>
+                        <option value="Java Junior Developer">Java Junior Developer</option>
+                        <option value="React Junior Developer">React Junior Developer</option>
+                        <option value="Frontend Developer">Frontend Developer</option>
+                        <option value="Backend Developer">Backend Developer</option>
+                        <option value="Java Senior Developer">Java Senior Developer</option>
+                        <option value="Python Senior Developer">Python Senior Developer</option>
+                        <option value="Senior Full Stack Developer">Senior Full Stack Developer</option>
+                        <option value="Senior React Developer">Senior React Developer</option>
+                        <option value="Fresher Python Developer">Fresher Python Developer</option>
+                        <option value="Fresher Java Developer">Fresher Java Developer</option>
+                        <option value="Fresher Web Developer">Fresher Web Developer</option>
+                        <option value="Machine Learning Intern">Machine Learning Intern</option>
+                        <option value="AI Intern">AI Intern</option>
+                        <option value="Data Science Intern">Data Science Intern</option>
+                        <option value="Deep Learning Intern">Deep Learning Intern</option>
+                    </select>
+                </div>
+                <div class="full">
+                    <label>Gender</label>
+                    <div>
+                        <label class="mr-3"><input type="radio" name="Gender" value="Male" {% if Job_Seeker.gender == "Male" %}checked{% endif %}> Male</label>
+                        <label><input type="radio" name="Gender" value="Female" {% if Job_Seeker.gender == "Female" %}checked{% endif %}> Female</label>
+                    </div>
+                </div>
+                <div class="full">
+                    <label>Change profile image</label>
+                    <input type="file" class="form-control-file" name="Image" accept="image/*">
+                </div>
             </div>
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="customRadioInline2"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Female">
-
-                <label class="custom-control-label"
-                       for="customRadioInline2">
-
-                    <i class="fa fa-female mr-2"></i>
-                    Female
-
-                </label>
-
-            </div>
-
-            {% else %}
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="customRadioInline1"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Male">
-
-                <label class="custom-control-label"
-                       for="customRadioInline1">
-
-                    <i class="fa fa-male mr-2"></i>
-                    Male
-
-                </label>
-
-            </div>
-
-            <div class="custom-control custom-radio custom-control-inline">
-
-                <input type="radio"
-                       id="customRadioInline2"
-                       name="Gender"
-                       class="custom-control-input"
-                       value="Female"
-                       checked>
-
-                <label class="custom-control-label"
-                       for="customRadioInline2">
-
-                    <i class="fa fa-female mr-2"></i>
-                    Female
-
-                </label>
-
-            </div>
-
-            {% endif %}
-
+            <input type="submit" value="Update Profile" class="btn btn-primary mt-4">
         </div>
-
-        <!-- Profile Image -->
-
-        <div class="col-sm-4 mt-5 text-center">
-
+        <div class="col-md-4 text-center mt-3 mt-md-0">
             {% if Job_Seeker.image %}
-
-            <img src="{{Job_Seeker.image.url}}"
-                 width="300px"
-                 height="300px"
-                 style="border-radius:10px; object-fit:cover;">
-
-            {% else %}
-
-            <img src="{% static 'images/default_user.png' %}"
-                 width="300px"
-                 height="300px"
-                 style="border-radius:10px; object-fit:cover;">
-
+            <img src="{{ Job_Seeker.image.url }}" width="220" height="220" alt="" style="border-radius:12px;object-fit:cover;border:1px solid var(--cb-border);">
             {% endif %}
-
         </div>
-
     </div>
-
-    <input type="submit"
-           value="Update Profile"
-           class="btn btn-primary">
-
 </form>
-
-</div>
-</div>
 </div>
 
-{% include 'footer.html' %}
+{% include 'Footer.html' %}
 
 {% if error == "no" %}
-
-<script>
-
-    alert("Profile Updated Successfully");
-
-    window.location.href = "{% url 'User_home' %}";
-
-</script>
-
+<script>alert("Profile updated successfully"); window.location.href = "{% url 'User_home' %}";</script>
 {% endif %}
-
 {% if error == "yes" %}
-
-<script>
-
-    alert("Something Went Wrong, Try Again...");
-
-</script>
-
+<script>alert("Something went wrong. Try again.");</script>
 {% endif %}
-
-{% endblock %}

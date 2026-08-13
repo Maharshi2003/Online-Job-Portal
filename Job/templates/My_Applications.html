@@ -1,0 +1,38 @@
+{% load static %}
+{% include 'User_navigation.html' %}
+<div class="page-header"><h1>My Applications</h1></div>
+<div class="container mt-4 mb-5">
+{% if applications %}
+<table class="table cb-table table-hover">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Applied On</th>
+            <th>Resume</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in applications %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td><a href="{% url 'job_detail' app.job.id %}">{{ app.job.job_title }}</a></td>
+            <td>{{ app.job.company.company_name|default:"—" }}</td>
+            <td>{{ app.Date }}</td>
+            <td>{% if app.Resume %}<a href="{{ app.Resume.url }}" target="_blank">View</a>{% else %}—{% endif %}</td>
+            <td>
+                {% if app.status == 'Accepted' %}<span class="badge-status badge-accepted">Accepted</span>
+                {% elif app.status == 'Rejected' %}<span class="badge-status badge-rejected">Rejected</span>
+                {% else %}<span class="badge-status badge-pending">Pending</span>{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state cb-card">You have not applied to any jobs yet. <a href="{% url 'User_latestjob' %}">Browse jobs</a></div>
+{% endif %}
+</div>
+{% include 'Footer.html' %}
